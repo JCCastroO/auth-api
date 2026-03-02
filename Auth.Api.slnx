@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/01 - Model/">
+    <Project Path="src/Auth.Api.Model/Auth.Api.Model.csproj" />
+    <Project Path="tests/Auth.Api.Model.Tests/Auth.Api.Model.Tests.csproj" />
+  </Folder>
+  <Folder Name="/02 - View/">
+    <Project Path="src/Auth.Api.AppHost/Auth.Api.AppHost.csproj" Id="5b61bd16-0bc7-49dd-af38-0de1433ac788" />
+    <Project Path="src/Auth.Api.View/Auth.Api.View.csproj" Id="55f75b3d-fc2b-4768-9463-f8adc87f1c70" />
+    <Project Path="tests/Auth.Api.View.Tests/Auth.Api.View.Tests.csproj" />
+  </Folder>
+  <Folder Name="/03 - Controller/">
+    <Project Path="src/Auth.Api.Controller/Auth.Api.Controller.csproj" />
+    <Project Path="src/Auth.Api.ServiceDefaults/Auth.Api.ServiceDefaults.csproj" />
+    <Project Path="tests/Auth.Api.Controller.Tests/Auth.Api.Controller.Tests.csproj" />
+  </Folder>
+</Solution>
