@@ -1,5 +1,4 @@
 ﻿using Auth.Api.View.Extensions;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Data;
 
@@ -18,7 +17,7 @@ public class DependencyInjectionTests
     }
 
     [Fact]
-    public void ShouldConfigureDapperDependency()
+    public void ShouldInjectDapperAsADependency()
     {
         // Arrange
 

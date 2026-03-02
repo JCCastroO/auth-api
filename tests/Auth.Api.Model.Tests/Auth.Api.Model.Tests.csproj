@@ -24,7 +24,6 @@
 
   <ItemGroup>
     <Folder Include="Integrated\Repositories\" />
-    <Folder Include="Unit\Entities\" />
   </ItemGroup>
 
 </Project>
