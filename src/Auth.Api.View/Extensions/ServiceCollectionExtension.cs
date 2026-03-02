@@ -1,4 +1,6 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using Auth.Api.Model.Repositories;
+using Auth.Api.Model.Repositories.Interfaces;
+using Microsoft.Data.SqlClient;
 using System.Data;
 
 namespace Auth.Api.View.Extensions;
@@ -19,5 +21,7 @@ public static class ServiceCollectionExtension
             var connectionString = configuration.GetConnectionString("Database");
             return new SqlConnection(connectionString);
         });
+
+        service.AddScoped<IUserRepository, UserRepository>();
     }
 }

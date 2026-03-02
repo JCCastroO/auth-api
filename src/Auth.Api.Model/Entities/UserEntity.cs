@@ -1,16 +1,16 @@
 ﻿namespace Auth.Api.Model.Entities;
 
-public class UserEntity(Guid id, string name, string email, string password)
+public class UserEntity()
 {
-    public Guid Id { get; init; } = id;
+    public Guid Id { get; init; } = Guid.NewGuid();
 
-    public string Name { get; init; } = name;
+    public string Name { get; init; }
 
-    public string Email { get; private set; } = email;
+    public string Email { get; init; }
 
-    public string Password { get; private set; } = password;
+    public string Password { get; init; }
 
     public DateTimeOffset CreatedAt { get; init; } = DateTimeOffset.UtcNow;
 
-    public DateTimeOffset? UpdatedAt { get; set; } = default;
+    public DateTimeOffset? UpdatedAt { get; private set; } = default;
 }

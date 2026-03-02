@@ -15,7 +15,14 @@ public class UserEntityTests
         var createdAt = DateTimeOffset.UtcNow;
 
         // Act
-        var user = new UserEntity(id, name, email, password);
+        var user = new UserEntity()
+        {
+            Id = id,
+            Name = name,
+            Email = email,
+            Password = password,
+            CreatedAt = createdAt
+        };
 
         // Assert
         Assert.NotNull(user);
@@ -23,7 +30,7 @@ public class UserEntityTests
         Assert.Equal(name, user.Name);
         Assert.Equal(email, user.Email);
         Assert.Equal(password, user.Password);
-        Assert.Equal(createdAt, user.CreatedAt, TimeSpan.FromSeconds(5));
+        Assert.Equal(createdAt, user.CreatedAt);
         Assert.Null(user.UpdatedAt);
     }
 }

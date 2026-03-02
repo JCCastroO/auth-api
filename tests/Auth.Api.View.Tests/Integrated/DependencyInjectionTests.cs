@@ -1,4 +1,6 @@
-﻿using Auth.Api.View.Extensions;
+﻿using Auth.Api.Model.Repositories;
+using Auth.Api.Model.Repositories.Interfaces;
+using Auth.Api.View.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using System.Data;
 
@@ -26,5 +28,19 @@ public class DependencyInjectionTests
 
         // Assert
         Assert.NotNull(service);
+    }
+
+    [Fact]
+    public void ShouldInjectUserRepositoryAsADependency()
+    {
+        // Arrange
+        var repository = new UserRepository(default!);
+
+        // Act
+        var service = _provider.GetRequiredService<IUserRepository>();
+
+        // Assert
+        Assert.NotNull(service);
+        Assert.Equivalent(repository, service);
     }
 }

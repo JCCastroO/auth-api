@@ -1,6 +1,7 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
 var postgres = builder.AddPostgres("postgres")
+    .WithImage("postgres:alpine3.23")
     .WithPgAdmin();
 
 builder.AddProject<Projects.Auth_Api_View>("authentication-api")
