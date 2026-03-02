@@ -1,4 +1,5 @@
-﻿using Microsoft.OpenApi;
+﻿using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace Auth.Api.View.Extensions;
 
@@ -13,5 +14,10 @@ public static class ServiceCollectionExtension
 
     private static void ConfigureAppDependencies(this IServiceCollection service, IConfiguration configuration)
     {
+        service.AddScoped<IDbConnection>(sp =>
+        {
+            var connectionString = configuration.GetConnectionString("Database");
+            return new SqlConnection(connectionString);
+        });
     }
 }
