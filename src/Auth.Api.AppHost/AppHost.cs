@@ -1,5 +1,10 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-builder.AddProject<Projects.Auth_Api_View>("auth-api-view");
+var postgres = builder.AddPostgres("postgres")
+    .WithPgAdmin();
+
+builder.AddProject<Projects.Auth_Api_View>("authentication-api")
+    .WaitFor(postgres)
+    .WithEnvironment("ConnectionStrings__Database", postgres.Resource.ConnectionStringExpression);
 
 builder.Build().Run();
