@@ -13,4 +13,9 @@
     <Project Path="src/Auth.Api.ServiceDefaults/Auth.Api.ServiceDefaults.csproj" />
     <Project Path="tests/Auth.Api.Controller.Tests/Auth.Api.Controller.Tests.csproj" />
   </Folder>
+  <Folder Name="/SolutionItems/">
+    <File Path=".gitignore" />
+    <File Path="Directory.Packages.props" />
+    <File Path="README.md" />
+  </Folder>
 </Solution>
