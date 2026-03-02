@@ -1,0 +1,5 @@
+[*.sql]
+generated_code = true
+
+[*.sql]
+dotnet_diagnostic.*.severity = none

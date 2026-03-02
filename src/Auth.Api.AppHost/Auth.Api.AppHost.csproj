@@ -16,4 +16,8 @@
     <ProjectReference Include="..\Auth.Api.View\Auth.Api.View.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Script\" />
+  </ItemGroup>
+
 </Project>

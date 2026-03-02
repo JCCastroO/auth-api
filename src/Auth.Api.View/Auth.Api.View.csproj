@@ -8,7 +8,10 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper" />
+    <PackageReference Include="Divino.OperationResult" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="Microsoft.Data.SqlClient" />
+    <PackageReference Include="Npgsql" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
   </ItemGroup>
 

@@ -1,4 +1,8 @@
-﻿using Auth.Api.Model.Repositories;
+﻿using Auth.Api.Controller.Services;
+using Auth.Api.Controller.Services.Interfaces;
+using Auth.Api.Controller.UseCases;
+using Auth.Api.Controller.UseCases.Interfaces;
+using Auth.Api.Model.Repositories;
 using Auth.Api.Model.Repositories.Interfaces;
 using Auth.Api.View.Extensions;
 using Microsoft.Extensions.DependencyInjection;
@@ -42,5 +46,33 @@ public class DependencyInjectionTests
         // Assert
         Assert.NotNull(service);
         Assert.Equivalent(repository, service);
+    }
+
+    [Fact]
+    public void ShouldInjectRegisterUserUseCaseAsADependency()
+    {
+        // Arrange
+        var useCase = new RegisterUserUseCase(default!, default!);
+
+        // Act
+        var service = _provider.GetRequiredService<IRegisterUserUseCase>();
+
+        // Assert
+        Assert.NotNull(service);
+        Assert.Equivalent(useCase, service);
+    }
+
+    [Fact]
+    public void ShouldInjectEncryptPasswordServiceAsADependency()
+    {
+        // Arrange
+        var expectedService = new EncryptPasswordService();
+
+        // Act
+        var service = _provider.GetRequiredService<IEncryptPasswordService>();
+
+        // Assert
+        Assert.NotNull(service);
+        Assert.Equivalent(expectedService, service);
     }
 }

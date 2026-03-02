@@ -22,9 +22,4 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Unit\UseCases\" />
-    <Folder Include="Unit\Services\" />
-  </ItemGroup>
-
 </Project>

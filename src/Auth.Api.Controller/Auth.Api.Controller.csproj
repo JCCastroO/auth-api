@@ -11,8 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services\Interfaces\" />
-    <Folder Include="UseCases\Interfaces\" />
+    <PackageReference Include="Divino.OperationResult" />
+    <PackageReference Include="NSubstitute" />
   </ItemGroup>
 
 </Project>
