@@ -30,7 +30,9 @@ public static class ServiceCollectionExtension
         service.AddScoped<IUserRepository, UserRepository>();
 
         service.AddScoped<IRegisterUserUseCase, RegisterUserUseCase>();
+        service.AddScoped<ILoginUseCase, LoginUseCase>();
 
         service.AddScoped<IEncryptPasswordService, EncryptPasswordService>();
+        service.AddScoped<ITokenService, TokenService>();
     }
 }

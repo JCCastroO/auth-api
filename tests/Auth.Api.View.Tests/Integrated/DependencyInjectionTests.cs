@@ -63,6 +63,20 @@ public class DependencyInjectionTests
     }
 
     [Fact]
+    public void ShouldInjectLoginUseCaseAsADependency()
+    {
+        // Arrange
+        var useCase = new LoginUseCase(default!, default!, default!);
+
+        // Act
+        var service = _provider.GetRequiredService<ILoginUseCase>();
+
+        // Assert
+        Assert.NotNull(service);
+        Assert.Equivalent(useCase, service);
+    }
+
+    [Fact]
     public void ShouldInjectEncryptPasswordServiceAsADependency()
     {
         // Arrange
@@ -70,6 +84,20 @@ public class DependencyInjectionTests
 
         // Act
         var service = _provider.GetRequiredService<IEncryptPasswordService>();
+
+        // Assert
+        Assert.NotNull(service);
+        Assert.Equivalent(expectedService, service);
+    }
+
+    [Fact]
+    public void ShouldInjectTokenServiceAsADependency()
+    {
+        // Arrange
+        var expectedService = new TokenService();
+
+        // Act
+        var service = _provider.GetRequiredService<ITokenService>();
 
         // Assert
         Assert.NotNull(service);

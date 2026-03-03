@@ -1,4 +1,6 @@
-﻿using Dapper;
+﻿using Auth.Api.Controller.Services;
+using Auth.Api.Model.Entities;
+using Dapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -57,5 +59,18 @@ public class PostgreSqlFixture : IAsyncLifetime
                 updated_at TIMESTAMP
             );
             """);
+
+        var encryptService = new EncryptPasswordService();
+
+        var user = new UserEntity()
+        {
+            Name = "Doe John",
+            Email = "doe.john@email.com",
+            Password = encryptService.Encrypt("doe@123")
+        };
+        await connection.ExecuteAsync("""
+            INSERT INTO users (id, name, email, password, created_at, updated_at)
+            VALUES (@Id, @Name, @Email, @Password, @CreatedAt, @UpdatedAt)
+            """, user);
     }
 }

@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="Divino.OperationResult" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <PackageReference Include="NSubstitute" />
   </ItemGroup>
 
