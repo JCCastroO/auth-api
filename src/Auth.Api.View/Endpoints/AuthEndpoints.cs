@@ -11,16 +11,11 @@ public static class AuthEndpoints
     {
         router.MapPost("api/v1/auth/register", static async ([FromServices] IRegisterUserUseCase useCase, [FromBody] RegisterUserDto dto) =>
         {
-            try
-            {
-                await useCase.Execute(dto);
+            var (success, error) = await useCase.Execute(dto);
+            if (!success && error is not null)
+                return Results.InternalServerError(error);
 
-                return Results.Ok();
-            }
-            catch (Exception ex)
-            {
-                return Results.InternalServerError(ex.Message);
-            }
+            return Results.Ok();
         })
             .WithName("Register User")
             .WithDisplayName("Register User")
