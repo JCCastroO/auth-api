@@ -4,13 +4,13 @@ using System.Net.Http.Json;
 
 namespace Auth.Api.View.Tests.Integrated.Endpoints;
 
-public class AuthEndpointsTests : IClassFixture<PostgreSqlFixture>
+public class AuthEndpointsTests : IClassFixture<PostgreSqlFixture>, IClassFixture<RedisFixture>
 {
     private readonly HttpClient _client;
 
-    public AuthEndpointsTests(PostgreSqlFixture dbFixture)
+    public AuthEndpointsTests(PostgreSqlFixture dbFixture, RedisFixture redisFixture)
     {
-        var factory = new AppTestContainer(dbFixture);
+        var factory = new AppTestContainer(dbFixture, redisFixture);
         _client = factory.CreateClient();
     }
 

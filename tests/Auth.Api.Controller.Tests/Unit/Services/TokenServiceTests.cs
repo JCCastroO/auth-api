@@ -33,20 +33,12 @@ public class TokenServiceTests
     public void ShouldGenerateAnRefreshJsonWebToken()
     {
         // Arrange
-        var email = "john.doe@email.com";
-        var user = new UserEntity()
-        {
-            Name = "Jhon Doe",
-            Email = email,
-            Password = "jhon@123"
-        };
 
         // Act
-        var (refreshToken, expiresRefreshOn) = _service.GenerateRefresh(user);
+        var refreshToken = _service.GenerateRefresh();
 
         // Assert
         Assert.NotNull(refreshToken);
         Assert.NotEmpty(refreshToken);
-        Assert.NotEqual(DateTimeOffset.UtcNow, expiresRefreshOn);
     }
 }

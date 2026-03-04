@@ -6,5 +6,5 @@ public interface ITokenService
 {
     (string AccessToken, DateTimeOffset ExpiresOn) Generate(UserEntity user);
 
-    (string RefreshToken, DateTimeOffset ExpiresRefreshOn) GenerateRefresh(UserEntity user);
+    string GenerateRefresh();
 }

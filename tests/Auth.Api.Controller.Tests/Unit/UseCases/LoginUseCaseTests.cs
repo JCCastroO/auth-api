@@ -1,10 +1,11 @@
 ﻿using Auth.Api.Controller.Dtos;
-using Auth.Api.Controller.Services;
 using Auth.Api.Controller.Services.Interfaces;
 using Auth.Api.Controller.UseCases;
 using Auth.Api.Controller.UseCases.Interfaces;
 using Auth.Api.Model.Entities;
 using Auth.Api.Model.Repositories.Interfaces;
+using Auth.Api.Model.Services.Interfaces;
+using Newtonsoft.Json;
 using NSubstitute;
 using OperationResult;
 
@@ -15,10 +16,11 @@ public class LoginUseCaseTests
     private readonly IUserRepository _repository = Substitute.For<IUserRepository>();
     private readonly IEncryptPasswordService _encryptPasswordService = Substitute.For<IEncryptPasswordService>();
     private readonly ITokenService _tokenService = Substitute.For<ITokenService>();
+    private readonly ICacheService _cacheService = Substitute.For<ICacheService>();
     private readonly ILoginUseCase _sut;
 
     public LoginUseCaseTests()
-        => _sut = new LoginUseCase(_repository, _encryptPasswordService, _tokenService);
+        => _sut = new LoginUseCase(_repository, _encryptPasswordService, _tokenService, _cacheService);
 
     [Fact]
     public async Task ShouldExecuteLoginThenReturnErrorWhenGetByEmailFailed()
@@ -39,6 +41,15 @@ public class LoginUseCaseTests
         await _repository.Received().GetByEmail(Arg.Do<string>(x => x = dto.Email));
         _encryptPasswordService.DidNotReceive()
             .Validate(default!, default!);
+        _tokenService
+            .DidNotReceive()
+            .Generate(default!);
+        _tokenService
+            .DidNotReceive()
+            .GenerateRefresh();
+        await _cacheService
+            .DidNotReceive()
+            .SetAsync(default!, default!, default!);
     }
 
     [Fact]
@@ -60,6 +71,15 @@ public class LoginUseCaseTests
         await _repository.Received().GetByEmail(Arg.Do<string>(x => x = dto.Email));
         _encryptPasswordService.DidNotReceive()
             .Validate(default!, default!);
+        _tokenService
+            .DidNotReceive()
+            .Generate(default!);
+        _tokenService
+            .DidNotReceive()
+            .GenerateRefresh();
+        await _cacheService
+            .DidNotReceive()
+            .SetAsync(default!, default!, default!);
     }
 
     [Fact]
@@ -94,6 +114,78 @@ public class LoginUseCaseTests
         _encryptPasswordService
             .Received()
             .Validate(Arg.Do<string>(x => x = dto.Password), Arg.Do<string>(x => x = user.Password));
+        _tokenService
+            .DidNotReceive()
+            .Generate(default!);
+        _tokenService
+            .DidNotReceive()
+            .GenerateRefresh();
+        await _cacheService
+            .DidNotReceive()
+            .SetAsync(default!, default!, default!);
+    }
+
+    [Fact]
+    public async Task ShouldExecuteLoginThenReturnErrorWhenSetCacheFailed()
+    {
+        // Arrange
+        var dto = new LoginDto("john.doe@email.com", "john@123");
+
+        var user = new UserEntity()
+        {
+            Name = "John Doe",
+            Email = dto.Email,
+            Password = _encryptPasswordService.Encrypt(dto.Password)
+        };
+        _repository
+            .GetByEmail(Arg.Do<string>(x => x = dto.Email))
+            .Returns(Result.Success<UserEntity?>(user));
+
+        _encryptPasswordService
+            .Validate(Arg.Do<string>(x => x = dto.Password), Arg.Do<string>(x => x = user.Password))
+            .Returns(true);
+
+        var accessToken = "access_token";
+        var refreshToken = "refresh_token";
+        var expiresOn = DateTimeOffset.UtcNow.AddMinutes(60);
+        var expiresRefreshOn = DateTimeOffset.UtcNow.AddDays(7);
+        _tokenService
+            .Generate(Arg.Do<UserEntity>(x => x = user))
+            .Returns((accessToken, expiresOn));
+        _tokenService
+            .GenerateRefresh()
+            .Returns(refreshToken);
+
+        _cacheService
+            .SetAsync(
+                Arg.Do<string>(x => x = $"refresh#{refreshToken}"),
+                Arg.Do<string>(x => x = JsonConvert.SerializeObject(new { user.Id, user.Email })),
+                Arg.Do<TimeSpan>(x => x = TimeSpan.FromDays(7)))
+            .Returns(Result.Error(new Exception("Internal Error")));
+
+        // Act
+        var result = await _sut.Execute(dto);
+
+        // Assert
+        Assert.False(result.IsSuccess);
+        await _repository
+            .Received()
+            .GetByEmail(Arg.Do<string>(x => x = dto.Email));
+        _encryptPasswordService
+            .Received()
+            .Validate(Arg.Do<string>(x => x = dto.Password), Arg.Do<string>(x => x = user.Password));
+        _tokenService
+            .Received()
+            .Generate(Arg.Do<UserEntity>(x => x = user));
+        _tokenService
+            .Received()
+            .GenerateRefresh();
+        await _cacheService
+            .Received()
+            .SetAsync(
+                Arg.Do<string>(x => x = $"refresh#{refreshToken}"),
+                Arg.Do<string>(x => x = JsonConvert.SerializeObject(new { user.Id, user.Email })),
+                Arg.Do<TimeSpan>(x => x = TimeSpan.FromDays(7)));
     }
 
     [Fact]
@@ -119,13 +211,20 @@ public class LoginUseCaseTests
         var accessToken = "access_token";
         var refreshToken = "refresh_token";
         var expiresOn = DateTimeOffset.UtcNow.AddMinutes(60);
-        var expiresRefreshOn = DateTimeOffset.UtcNow.AddMinutes(180);
+        var expiresRefreshOn = DateTimeOffset.UtcNow.AddDays(7);
         _tokenService
             .Generate(Arg.Do<UserEntity>(x => x = user))
             .Returns((accessToken, expiresOn));
         _tokenService
-            .GenerateRefresh(Arg.Do<UserEntity>(x => x = user))
-            .Returns((refreshToken, expiresRefreshOn));
+            .GenerateRefresh()
+            .Returns(refreshToken);
+
+        _cacheService
+            .SetAsync(
+                Arg.Do<string>(x => x = $"refresh#{refreshToken}"),
+                Arg.Do<string>(x => x = JsonConvert.SerializeObject(new { user.Id, user.Email })),
+                Arg.Do<TimeSpan>(x => x = TimeSpan.FromDays(7)))
+            .Returns(Result.Success());
 
         var response = new LoginResponse(accessToken, refreshToken, expiresOn, expiresRefreshOn);
 
@@ -134,7 +233,10 @@ public class LoginUseCaseTests
 
         // Assert
         Assert.True(result.IsSuccess);
-        Assert.Equal(response, result.Value);
+        Assert.Equal(response.AccessToken, result.Value.AccessToken);
+        Assert.Equal(response.RefreshToken, result.Value.RefreshToken);
+        Assert.Equal(response.ExpiresOn, result.Value.ExpiresOn, TimeSpan.FromSeconds(5));
+        Assert.Equal(response.ExpiresRefreshOn, result.Value.ExpiresRefreshOn, TimeSpan.FromSeconds(5));
         await _repository
             .Received()
             .GetByEmail(Arg.Do<string>(x => x = dto.Email));
@@ -146,6 +248,12 @@ public class LoginUseCaseTests
             .Generate(Arg.Do<UserEntity>(x => x = user));
         _tokenService
             .Received()
-            .GenerateRefresh(Arg.Do<UserEntity>(x => x = user));
+            .GenerateRefresh();
+        await _cacheService
+            .Received()
+            .SetAsync(
+                Arg.Do<string>(x => x = $"refresh#{refreshToken}"),
+                Arg.Do<string>(x => x = JsonConvert.SerializeObject(new { user.Id, user.Email })),
+                Arg.Do<TimeSpan>(x => x = TimeSpan.FromDays(7)));
     }
 }

@@ -4,22 +4,23 @@ using Auth.Api.Controller.UseCases;
 using Auth.Api.Controller.UseCases.Interfaces;
 using Auth.Api.Model.Repositories;
 using Auth.Api.Model.Repositories.Interfaces;
-using Auth.Api.View.Extensions;
+using Auth.Api.Model.Services;
+using Auth.Api.Model.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 using System.Data;
 
 namespace Auth.Api.View.Tests.Integrated;
 
-public class DependencyInjectionTests
+public class DependencyInjectionTests : IClassFixture<PostgreSqlFixture>, IClassFixture<RedisFixture>
 {
-    private readonly IServiceCollection _service = new ServiceCollection();
+    private readonly AppTestContainer _factory;
     private readonly IServiceProvider _provider;
 
-    public DependencyInjectionTests()
+    public DependencyInjectionTests(PostgreSqlFixture dbFixture, RedisFixture redisFixture)
     {
-        _service.ConfigureServices(default!);
-
-        _provider = _service.BuildServiceProvider();
+        _factory = new(dbFixture, redisFixture);
+        _provider = _factory.Services;
     }
 
     [Fact]
@@ -29,6 +30,18 @@ public class DependencyInjectionTests
 
         // Act
         var service = _provider.GetRequiredService<IDbConnection>();
+
+        // Assert
+        Assert.NotNull(service);
+    }
+
+    [Fact]
+    public void ShouldInjectRedisAsADependency()
+    {
+        // Arrange
+
+        // Act
+        var service = _provider.GetRequiredService<IConnectionMultiplexer>();
 
         // Assert
         Assert.NotNull(service);
@@ -49,6 +62,21 @@ public class DependencyInjectionTests
     }
 
     [Fact]
+    public void ShouldInjectCacheServiceAsADependency()
+    {
+        // Arrange
+        var connection = _provider.GetRequiredService<IConnectionMultiplexer>();
+        var expectedService = new CacheService(connection);
+
+        // Act
+        var service = _provider.GetRequiredService<ICacheService>();
+
+        // Assert
+        Assert.NotNull(service);
+        Assert.Equivalent(expectedService, service);
+    }
+
+    [Fact]
     public void ShouldInjectRegisterUserUseCaseAsADependency()
     {
         // Arrange
@@ -66,7 +94,7 @@ public class DependencyInjectionTests
     public void ShouldInjectLoginUseCaseAsADependency()
     {
         // Arrange
-        var useCase = new LoginUseCase(default!, default!, default!);
+        var useCase = new LoginUseCase(default!, default!, default!, default!);
 
         // Act
         var service = _provider.GetRequiredService<ILoginUseCase>();

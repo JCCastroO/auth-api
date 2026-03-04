@@ -4,7 +4,10 @@ using Auth.Api.Controller.UseCases;
 using Auth.Api.Controller.UseCases.Interfaces;
 using Auth.Api.Model.Repositories;
 using Auth.Api.Model.Repositories.Interfaces;
+using Auth.Api.Model.Services;
+using Auth.Api.Model.Services.Interfaces;
 using Npgsql;
+using StackExchange.Redis;
 using System.Data;
 
 namespace Auth.Api.View.Extensions;
@@ -21,13 +24,14 @@ public static class ServiceCollectionExtension
 
     private static void ConfigureAppDependencies(this IServiceCollection service, IConfiguration configuration)
     {
-        service.AddScoped<IDbConnection>(sp =>
+        service.AddSingleton<IDbConnection>(sp =>
         {
             var connectionString = configuration.GetConnectionString("Database");
             return new NpgsqlConnection(connectionString);
         });
 
         service.AddScoped<IUserRepository, UserRepository>();
+        service.AddScoped<ICacheService, CacheService>();
 
         service.AddScoped<IRegisterUserUseCase, RegisterUserUseCase>();
         service.AddScoped<ILoginUseCase, LoginUseCase>();

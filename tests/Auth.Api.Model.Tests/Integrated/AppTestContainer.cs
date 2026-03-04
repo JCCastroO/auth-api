@@ -1,15 +1,20 @@
 ﻿using Dapper;
 using Npgsql;
+using StackExchange.Redis;
+using System.ComponentModel;
 using System.Data;
 using Testcontainers.PostgreSql;
+using Testcontainers.Redis;
 
 namespace Auth.Api.Model.Tests.Integrated;
 
 public class AppTestContainer : IAsyncLifetime
 {
     private PostgreSqlContainer _container = default!;
+    private RedisContainer _redisContainer = default!;
 
     protected IDbConnection Connection = default!;
+    protected IConnectionMultiplexer RedisConnection = default!;
 
     public async Task InitializeAsync()
     {
@@ -19,9 +24,15 @@ public class AppTestContainer : IAsyncLifetime
             .WithPassword("test")
             .Build();
 
+        _redisContainer = new RedisBuilder("redis:7-alpine")
+           .WithCleanUp(true)
+           .Build();
+
         await _container.StartAsync();
+        await _redisContainer.StartAsync();
 
         Connection = new NpgsqlConnection(_container.GetConnectionString());
+        RedisConnection = ConnectionMultiplexer.Connect(_redisContainer.GetConnectionString());
 
         Connection.Open();
         await CreateSchemaAsync();
