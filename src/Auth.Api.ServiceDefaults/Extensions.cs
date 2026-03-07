@@ -7,12 +7,11 @@ using Microsoft.Extensions.Logging;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Auth.Api.ServiceDefaults;
 
-// Adds common Aspire services: service discovery, resilience, health checks, and OpenTelemetry.
-// This project should be referenced by each service project in your solution.
-// To learn more about using this project, see https://aka.ms/dotnet/aspire/service-defaults
+[ExcludeFromCodeCoverage]
 public static class Extensions
 {
     private const string HealthEndpointPath = "/health";
