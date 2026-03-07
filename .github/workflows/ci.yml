@@ -59,3 +59,11 @@ jobs:
       with:
         name: coverage-report
         path: coverage/report
+
+    - name: Commit coverage badge
+      run: |
+        git config --global user.name "github-actions"
+        git config --global user.email "github-actions@github.com"
+        git add coverage-summary.svg
+        git commit -m "Update coverage badge" || echo "No changes"
+        git push
