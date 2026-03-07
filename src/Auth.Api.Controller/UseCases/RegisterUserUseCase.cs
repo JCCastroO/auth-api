@@ -27,13 +27,13 @@ public class RegisterUserUseCase(
         if (!existingUserSuccess && existingUserError is not null)
         {
             _logger.LogError(existingUserError, "An unexpected error occurred on database search for user. Email: {Email}", request.Email);
-            return Result.Error(new Exception("Internal Error"));
+            return Result.Error(new SystemException("Internal Error"));
         }
 
         if (existingUser is not null)
         {
             _logger.LogWarning("User Already Exists. Email: {Email}", request.Email);
-            return Result.Error(new Exception("User Already Exists"));
+            return Result.Error(new ApplicationException("User Already Exists"));
         }
 
         var user = new UserEntity()
@@ -47,7 +47,7 @@ public class RegisterUserUseCase(
         if (!insertSuccess && insertError is not null)
         {
             _logger.LogError(insertError, "An unexpected error occurred on insert user in database. Email: {Email}", request.Email);
-            return Result.Error(new Exception("Internal Error"));
+            return Result.Error(new SystemException("Internal Error"));
         }
 
         _logger.LogInformation("Finalizing Register Successfully. Email: {Email}", request.Email);

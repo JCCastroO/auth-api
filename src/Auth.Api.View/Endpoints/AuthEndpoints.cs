@@ -1,6 +1,7 @@
 ﻿using Auth.Api.Controller.Requests;
 using Auth.Api.Controller.Responses;
 using Auth.Api.Controller.UseCases.Interfaces;
+using Auth.Api.View.Handlers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Auth.Api.View.Endpoints;
@@ -13,7 +14,7 @@ public static class AuthEndpoints
         {
             var (success, error) = await useCase.Execute(dto);
             if (!success && error is not null)
-                return Results.InternalServerError(error);
+                return ExceptionHandler.Error(error);
 
             return Results.Ok();
         })
@@ -21,14 +22,15 @@ public static class AuthEndpoints
             .WithDisplayName("Register User")
             .WithTags("Auth")
             .WithDescription("This endpoint is a request for register a new user.")
-            .Produces(200)
-            .Produces(500);
+            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status422UnprocessableEntity, typeof(ApplicationException))
+            .Produces(StatusCodes.Status500InternalServerError, typeof(SystemException));
 
         router.MapPost("api/v1/auth/login", static async ([FromServices] ILoginUseCase useCase, [FromBody] LoginRequest dto) =>
         {
             var (success, result, error) = await useCase.Execute(dto);
             if (!success && error is not null)
-                return Results.InternalServerError(error);
+                return ExceptionHandler.Error(error);
 
             return Results.Ok(result);
         })
@@ -36,14 +38,15 @@ public static class AuthEndpoints
             .WithDisplayName("Login User")
             .WithTags("Auth")
             .WithDescription("This endpoint is a request for get an access token linked to the user.")
-            .Produces<LoginResponse>(200)
-            .Produces(500);
+            .Produces(StatusCodes.Status200OK, typeof(LoginResponse))
+            .Produces(StatusCodes.Status401Unauthorized, typeof(UnauthorizedAccessException))
+            .Produces(StatusCodes.Status500InternalServerError, typeof(SystemException));
 
         router.MapPost("api/v1/auth/refresh_token", static async ([FromServices] IRefreshTokenUseCase useCase, [FromBody] RefreshTokenRequest dto) =>
         {
             var (success, result, error) = await useCase.Execute(dto);
             if (!success && error is not null)
-                return Results.InternalServerError(error);
+                return ExceptionHandler.Error(error);
 
             return Results.Ok(result);
         })
@@ -51,7 +54,8 @@ public static class AuthEndpoints
             .WithDisplayName("Refresh User Access")
             .WithTags("Auth")
             .WithDescription("This endpoint is a request for refresh access token linked to the user.")
-            .Produces<RefreshTokenResponse>(200)
-            .Produces(500);
+            .Produces(StatusCodes.Status200OK, typeof(RefreshTokenResponse))
+            .Produces(StatusCodes.Status401Unauthorized, typeof(UnauthorizedAccessException))
+            .Produces(StatusCodes.Status500InternalServerError, typeof(SystemException));
     }
 }

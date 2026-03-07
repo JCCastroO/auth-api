@@ -33,19 +33,19 @@ public class LoginUseCase(
         if (!userSuccess && userError is not null)
         {
             _logger.LogError(userError, "An unexpected error occurred on database search for user. Email: {Email}", request.Email);
-            return Result.Error<LoginResponse>(new Exception("Internal Error"));
+            return Result.Error<LoginResponse>(new SystemException("Internal Error"));
         }
 
         if (user is null)
         {
             _logger.LogWarning("User not found. Email: {Email}", request.Email);
-            return Result.Error<LoginResponse>(new Exception("Unauthorized"));
+            return Result.Error<LoginResponse>(new UnauthorizedAccessException("Unauthorized"));
         }
 
         if (!_encryptPasswordService.Validate(request.Password, user.Password))
         {
             _logger.LogWarning("Wrong Password. Email: {Email}", request.Email);
-            return Result.Error<LoginResponse>(new Exception("Unauthorized"));
+            return Result.Error<LoginResponse>(new UnauthorizedAccessException("Unauthorized"));
         }
 
         var (accessToken, expiresOn) = _tokenService.Generate(user);
@@ -59,7 +59,7 @@ public class LoginUseCase(
         if (!cacheSuccess && cacheError is not null)
         {
             _logger.LogError(cacheError, "An unexpected error occurred on set refresh token cache. Email: {Email}", request.Email);
-            return Result.Error<LoginResponse>(new Exception("Internal Error"));
+            return Result.Error<LoginResponse>(new SystemException("Internal Error"));
         }
 
         _logger.LogInformation("Finalizing Login Successfully. Email: {Email}", request.Email);

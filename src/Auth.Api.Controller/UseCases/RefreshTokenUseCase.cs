@@ -31,13 +31,13 @@ public class RefreshTokenUseCase(
         if (!cacheDataSuccess && cacheDataError is not null)
         {
             _logger.LogError(cacheDataError, "An unexpected error occurred on cache data search. CacheKey: {CacheKey}", cacheKey);
-            return Result.Error<RefreshTokenResponse>(new Exception("Internal Error"));
+            return Result.Error<RefreshTokenResponse>(new SystemException("Internal Error"));
         }
 
         if (cacheData is null)
         {
             _logger.LogWarning("Data not found. CacheKey: {CacheKey}", cacheKey);
-            return Result.Error<RefreshTokenResponse>(new Exception("Unauthorized"));
+            return Result.Error<RefreshTokenResponse>(new UnauthorizedAccessException("Unauthorized"));
         }
 
         var user = new UserEntity
@@ -54,7 +54,7 @@ public class RefreshTokenUseCase(
         if (!removeCacheSuccess && removeCacheError is not null)
         {
             _logger.LogError(removeCacheError, "An unexpected error occurred on remove old cache data. CacheKey: {CacheKey}", cacheKey);
-            return Result.Error<RefreshTokenResponse>(new Exception("Internal Error"));
+            return Result.Error<RefreshTokenResponse>(new SystemException("Internal Error"));
         }
 
         var (setCacheSuccess, setCacheError) = await _cacheService.SetAsync(
@@ -64,7 +64,7 @@ public class RefreshTokenUseCase(
         if (!setCacheSuccess && setCacheError is not null)
         {
             _logger.LogError(setCacheError, "An unexpected error occurred on set refresh token cache. Email: {Email}", user.Email);
-            return Result.Error<RefreshTokenResponse>(new Exception("Internal Error"));
+            return Result.Error<RefreshTokenResponse>(new SystemException("Internal Error"));
         }
 
         _logger.LogInformation("Finalizing Refresh Token Successfully. Email: {Email}", user.Email);
