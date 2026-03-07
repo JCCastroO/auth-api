@@ -1,21 +1,33 @@
 ﻿using Auth.Api.Controller.Services.Interfaces;
+using Konscious.Security.Cryptography;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace Auth.Api.Controller.Services;
 
 public class EncryptPasswordService : IEncryptPasswordService
 {
     private const int SALT_SIZE = 16;
-    private const int KEY_SIZE = 32;
-    private const int ITERATIONS = 100_000;
+    private const int THREADS_USED = 8;
+    private const int ITERATIONS = 4;
+    private const int MEMORY_USED = 1024 * 64;
+    private const int HASH_SIZE = 32;
 
     public string Encrypt(string password)
     {
         var salt = RandomNumberGenerator.GetBytes(SALT_SIZE);
 
-        var key = Rfc2898DeriveBytes.Pbkdf2(password, salt, ITERATIONS, HashAlgorithmName.SHA256, KEY_SIZE);
+        var argon2 = new Argon2id(Encoding.UTF8.GetBytes(password))
+        {
+            Salt = salt,
+            DegreeOfParallelism = THREADS_USED,
+            Iterations = ITERATIONS,
+            MemorySize = MEMORY_USED
+        };
 
-        return $"{Convert.ToBase64String(salt)}#{Convert.ToBase64String(key)}";
+        var hash = argon2.GetBytes(HASH_SIZE);
+
+        return $"{Convert.ToBase64String(salt)}#{Convert.ToBase64String(hash)}";
     }
 
     public bool Validate(string password, string hash)
@@ -25,10 +37,18 @@ public class EncryptPasswordService : IEncryptPasswordService
             return false;
 
         var salt = Convert.FromBase64String(parts[0]);
-        var expectedKey = Convert.FromBase64String(parts[1]);
+        var expectedHash = Convert.FromBase64String(parts[1]);
 
-        var actualKey = Rfc2898DeriveBytes.Pbkdf2(password, salt, ITERATIONS, HashAlgorithmName.SHA256, expectedKey.Length);
+        var argon2 = new Argon2id(Encoding.UTF8.GetBytes(password))
+        {
+            Salt = salt,
+            DegreeOfParallelism = THREADS_USED,
+            Iterations = ITERATIONS,
+            MemorySize = MEMORY_USED
+        };
 
-        return CryptographicOperations.FixedTimeEquals(actualKey, expectedKey);
+        var actualHash = argon2.GetBytes(HASH_SIZE);
+
+        return CryptographicOperations.FixedTimeEquals(actualHash, expectedHash);
     }
 }
