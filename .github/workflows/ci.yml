@@ -45,6 +45,14 @@ jobs:
             -targetdir:coverage/report \
             -reporttypes:"HtmlSummary"
 
+    - name: Code coverage summary
+      uses: irongut/CodeCoverageSummary@v1
+      with:
+        filename: coverage/**/coverage.cobertura.xml
+        badge: true
+        format: markdown
+        output: both
+
     - name: Upload coverage report
       uses: actions/upload-artifact@v4
       with:
