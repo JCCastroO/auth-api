@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using OperationResult;
 using StackExchange.Redis;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Auth.Api.Model.Services;
 
@@ -23,18 +24,34 @@ public class CacheService(IConnectionMultiplexer connection) : ICacheService
         }
     }
 
-    public async Task<Result<T>> GetAsync<T>(string key)
+    public async Task<Result<T?>> GetAsync<T>(string key)
     {
         try
         {
             var data = await _database.StringGetAsync(key);
-            var result = JsonConvert.DeserializeObject<T>(data);
+            if (data.IsNull)
+                return Result.Success<T?>(default);
 
+            var result = JsonConvert.DeserializeObject<T>(data!);
             return Result.Success(result);
         }
         catch (Exception ex)
         {
-            return Result.Error<T>(ex);
+            return Result.Error<T?>(ex);
+        }
+    }
+
+    public async Task<Result> RemoveAsync(string key)
+    {
+        try
+        {
+            await _database.KeyDeleteAsync(key);
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Error(ex);
         }
     }
 }

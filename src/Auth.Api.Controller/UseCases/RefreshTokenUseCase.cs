@@ -18,7 +18,8 @@ public class RefreshTokenUseCase(
 
     public async Task<Result<RefreshTokenResponse>> Execute(RefreshTokenDto dto)
     {
-        var (cacheDataSuccess, cacheData, cacheDataError) = await _cacheService.GetAsync<RefreshTokenCacheResultDto>($"refresh#{dto.RefreshToken}");
+        var cacheKey = $"refresh#{dto.RefreshToken}";
+        var (cacheDataSuccess, cacheData, cacheDataError) = await _cacheService.GetAsync<RefreshTokenCacheResultDto>(cacheKey);
         if (!cacheDataSuccess && cacheDataError is not null)
             return Result.Error<RefreshTokenResponse>(new Exception("Internal Error"));
 
@@ -35,11 +36,15 @@ public class RefreshTokenUseCase(
         var refreshToken = _tokenService.GenerateRefresh();
         var expiresRefreshOn = DateTimeOffset.UtcNow.AddDays(REFRESH_TOKEN_EXPIRES_ON);
 
-        var (cacheSuccess, cacheError) = await _cacheService.SetAsync(
+        var (removeCacheSuccess, removeCacheError) = await _cacheService.RemoveAsync(cacheKey);
+        if (!removeCacheSuccess && removeCacheError is not null)
+            return Result.Error<RefreshTokenResponse>(new Exception("Internal Error"));
+
+        var (setCacheSuccess, setCacheError) = await _cacheService.SetAsync(
             $"refresh#{refreshToken}",
             JsonConvert.SerializeObject(new { user.Id, user.Email }),
             TimeSpan.FromDays(REFRESH_TOKEN_EXPIRES_ON));
-        if (!cacheSuccess && cacheError is not null)
+        if (!setCacheSuccess && setCacheError is not null)
             return Result.Error<RefreshTokenResponse>(new Exception("Internal Error"));
 
         return Result.Success(new RefreshTokenResponse(accessToken, refreshToken, expiresOn, expiresRefreshOn));
