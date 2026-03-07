@@ -4,6 +4,7 @@ using Auth.Api.Controller.UseCases;
 using Auth.Api.Controller.UseCases.Interfaces;
 using Auth.Api.Model.Entities;
 using Auth.Api.Model.Repositories.Interfaces;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using OperationResult;
 
@@ -11,12 +12,13 @@ namespace Auth.Api.Controller.Tests.Unit.UseCases;
 
 public class RegisterUserUseCaseTests
 {
+    private readonly ILogger<RegisterUserUseCase> _logger = Substitute.For<ILogger<RegisterUserUseCase>>();
     private readonly IUserRepository _repository = Substitute.For<IUserRepository>();
     private readonly IEncryptPasswordService _encryptPasswordService = Substitute.For<IEncryptPasswordService>();
     private readonly IRegisterUserUseCase _sut;
 
     public RegisterUserUseCaseTests()
-        => _sut = new RegisterUserUseCase(_repository, _encryptPasswordService);
+        => _sut = new RegisterUserUseCase(_logger, _repository, _encryptPasswordService);
 
     [Fact]
     public async Task ShouldExecuteRegisterUserThenReturnErrorWhenGetByEmailFailed()

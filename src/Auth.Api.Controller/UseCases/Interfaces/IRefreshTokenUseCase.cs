@@ -6,5 +6,5 @@ namespace Auth.Api.Controller.UseCases.Interfaces;
 
 public interface IRefreshTokenUseCase
 {
-    Task<Result<RefreshTokenResponse>> Execute(RefreshTokenRequest dto);
+    Task<Result<RefreshTokenResponse>> Execute(RefreshTokenRequest request);
 }

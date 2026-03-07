@@ -6,6 +6,8 @@ using Auth.Api.Controller.UseCases;
 using Auth.Api.Controller.UseCases.Interfaces;
 using Auth.Api.Model.Entities;
 using Auth.Api.Model.Services.Interfaces;
+using Castle.Core.Logging;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using NSubstitute;
 using OperationResult;
@@ -14,12 +16,13 @@ namespace Auth.Api.Controller.Tests.Unit.UseCases;
 
 public class RefreshTokenUseCaseTests
 {
+    private readonly ILogger<RefreshTokenUseCase> _logger = Substitute.For<ILogger<RefreshTokenUseCase>>();
     private readonly ICacheService _cacheService = Substitute.For<ICacheService>();
     private readonly ITokenService _tokenService = Substitute.For<ITokenService>();
     private readonly IRefreshTokenUseCase _sut;
 
     public RefreshTokenUseCaseTests()
-        => _sut = new RefreshTokenUseCase(_cacheService, _tokenService);
+        => _sut = new RefreshTokenUseCase(_logger, _cacheService, _tokenService);
 
     [Fact]
     public async Task ShouldExecuteRefreshTokenUseCaseThenReturnErrorWhenGetCacheFailed()

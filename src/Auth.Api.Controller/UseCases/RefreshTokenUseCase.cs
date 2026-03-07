@@ -5,28 +5,40 @@ using Auth.Api.Controller.Services.Interfaces;
 using Auth.Api.Controller.UseCases.Interfaces;
 using Auth.Api.Model.Entities;
 using Auth.Api.Model.Services.Interfaces;
+using Castle.Core.Logging;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using OperationResult;
 
 namespace Auth.Api.Controller.UseCases;
 
 public class RefreshTokenUseCase(
+    ILogger<RefreshTokenUseCase> logger,
     ICacheService cacheService,
     ITokenService tokenService) : IRefreshTokenUseCase
 {
     private const int REFRESH_TOKEN_EXPIRES_ON = 7;
+    private readonly ILogger<RefreshTokenUseCase> _logger = logger;
     private readonly ICacheService _cacheService = cacheService;
     private readonly ITokenService _tokenService = tokenService;
 
-    public async Task<Result<RefreshTokenResponse>> Execute(RefreshTokenRequest dto)
+    public async Task<Result<RefreshTokenResponse>> Execute(RefreshTokenRequest request)
     {
-        var cacheKey = $"refresh#{dto.RefreshToken}";
+        _logger.LogInformation("Initializing Refresh Token.");
+
+        var cacheKey = $"refresh#{request.RefreshToken}";
         var (cacheDataSuccess, cacheData, cacheDataError) = await _cacheService.GetAsync<RefreshTokenCacheResultDto>(cacheKey);
         if (!cacheDataSuccess && cacheDataError is not null)
+        {
+            _logger.LogError(cacheDataError, "An unexpected error occurred on cache data search. CacheKey: {CacheKey}", cacheKey);
             return Result.Error<RefreshTokenResponse>(new Exception("Internal Error"));
+        }
 
         if (cacheData is null)
-            return Result.Error<RefreshTokenResponse>(new Exception("Unhautorized"));
+        {
+            _logger.LogWarning("Data not found. CacheKey: {CacheKey}", cacheKey);
+            return Result.Error<RefreshTokenResponse>(new Exception("Unauthorized"));
+        }
 
         var user = new UserEntity
         {
@@ -40,15 +52,22 @@ public class RefreshTokenUseCase(
 
         var (removeCacheSuccess, removeCacheError) = await _cacheService.RemoveAsync(cacheKey);
         if (!removeCacheSuccess && removeCacheError is not null)
+        {
+            _logger.LogError(removeCacheError, "An unexpected error occurred on remove old cache data. CacheKey: {CacheKey}", cacheKey);
             return Result.Error<RefreshTokenResponse>(new Exception("Internal Error"));
+        }
 
         var (setCacheSuccess, setCacheError) = await _cacheService.SetAsync(
             $"refresh#{refreshToken}",
             JsonConvert.SerializeObject(new { user.Id, user.Email }),
             TimeSpan.FromDays(REFRESH_TOKEN_EXPIRES_ON));
         if (!setCacheSuccess && setCacheError is not null)
+        {
+            _logger.LogError(setCacheError, "An unexpected error occurred on set refresh token cache. Email: {Email}", user.Email);
             return Result.Error<RefreshTokenResponse>(new Exception("Internal Error"));
+        }
 
+        _logger.LogInformation("Finalizing Refresh Token Successfully. Email: {Email}", user.Email);
         return Result.Success(new RefreshTokenResponse(accessToken, refreshToken, expiresOn, expiresRefreshOn));
     }
 }

@@ -6,6 +6,8 @@ using Auth.Api.Controller.UseCases.Interfaces;
 using Auth.Api.Model.Entities;
 using Auth.Api.Model.Repositories.Interfaces;
 using Auth.Api.Model.Services.Interfaces;
+using Castle.Core.Logging;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using NSubstitute;
 using OperationResult;
@@ -14,6 +16,7 @@ namespace Auth.Api.Controller.Tests.Unit.UseCases;
 
 public class LoginUseCaseTests
 {
+    private readonly ILogger<LoginUseCase> _logger = Substitute.For<ILogger<LoginUseCase>>();
     private readonly IUserRepository _repository = Substitute.For<IUserRepository>();
     private readonly IEncryptPasswordService _encryptPasswordService = Substitute.For<IEncryptPasswordService>();
     private readonly ITokenService _tokenService = Substitute.For<ITokenService>();
@@ -21,7 +24,7 @@ public class LoginUseCaseTests
     private readonly ILoginUseCase _sut;
 
     public LoginUseCaseTests()
-        => _sut = new LoginUseCase(_repository, _encryptPasswordService, _tokenService, _cacheService);
+        => _sut = new LoginUseCase(_logger, _repository, _encryptPasswordService, _tokenService, _cacheService);
 
     [Fact]
     public async Task ShouldExecuteLoginThenReturnErrorWhenGetByEmailFailed()

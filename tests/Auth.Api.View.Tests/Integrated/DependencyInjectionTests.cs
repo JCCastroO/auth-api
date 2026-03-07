@@ -80,7 +80,7 @@ public class DependencyInjectionTests : IClassFixture<PostgreSqlFixture>, IClass
     public void ShouldInjectRegisterUserUseCaseAsADependency()
     {
         // Arrange
-        var useCase = new RegisterUserUseCase(default!, default!);
+        var useCase = new RegisterUserUseCase(default!, default!, default!);
 
         // Act
         var service = _provider.GetRequiredService<IRegisterUserUseCase>();
@@ -94,7 +94,7 @@ public class DependencyInjectionTests : IClassFixture<PostgreSqlFixture>, IClass
     public void ShouldInjectLoginUseCaseAsADependency()
     {
         // Arrange
-        var useCase = new LoginUseCase(default!, default!, default!, default!);
+        var useCase = new LoginUseCase(default!, default!, default!, default!, default!);
 
         // Act
         var service = _provider.GetRequiredService<ILoginUseCase>();
@@ -108,7 +108,7 @@ public class DependencyInjectionTests : IClassFixture<PostgreSqlFixture>, IClass
     public void ShouldInjectRefreshTokenUseCaseAsADependency()
     {
         // Arrange
-        var useCase = new RefreshTokenUseCase(default!, default!);
+        var useCase = new RefreshTokenUseCase(default!, default!, default!);
 
         // Act
         var service = _provider.GetRequiredService<IRefreshTokenUseCase>();

@@ -6,5 +6,5 @@ namespace Auth.Api.Controller.UseCases.Interfaces;
 
 public interface ILoginUseCase
 {
-    Task<Result<LoginResponse>> Execute(LoginRequest dto);
+    Task<Result<LoginResponse>> Execute(LoginRequest request);
 }

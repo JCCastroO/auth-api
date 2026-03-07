@@ -5,5 +5,5 @@ namespace Auth.Api.Controller.UseCases.Interfaces;
 
 public interface IRegisterUserUseCase
 {
-    Task<Result> Execute(RegisterUserRequest userDto);
+    Task<Result> Execute(RegisterUserRequest request);
 }
