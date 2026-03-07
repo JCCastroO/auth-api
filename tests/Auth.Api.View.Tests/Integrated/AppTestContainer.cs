@@ -42,8 +42,8 @@ public class AppTestContainer(PostgreSqlFixture dbFixture, RedisFixture redisFix
             services.AddSingleton<ILoginUseCase, LoginUseCase>();
             services.AddSingleton<IRefreshTokenUseCase, RefreshTokenUseCase>();
 
-            services.AddSingleton<IEncryptPasswordService, EncryptPasswordService>();
-            services.AddSingleton<ITokenService, TokenService>();
+            services.AddSingleton<IEncryptPasswordService>(_ => new EncryptPasswordService(16, 8, 4, 1024 * 64, 32));
+            services.AddSingleton<ITokenService>(_ => new TokenService("key", "app", 60, 64));
         });
 }
 
@@ -83,7 +83,7 @@ public class PostgreSqlFixture : IAsyncLifetime
             );
             """);
 
-        var encryptService = new EncryptPasswordService();
+        var encryptService = new EncryptPasswordService(16, 8, 4, 1024 * 64, 32);
 
         var user = new UserEntity()
         {

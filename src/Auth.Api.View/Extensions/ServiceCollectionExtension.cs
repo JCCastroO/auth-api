@@ -36,7 +36,24 @@ public static class ServiceCollectionExtension
         service.AddScoped<ILoginUseCase, LoginUseCase>();
         service.AddScoped<IRefreshTokenUseCase, RefreshTokenUseCase>();
 
-        service.AddScoped<IEncryptPasswordService, EncryptPasswordService>();
-        service.AddScoped<ITokenService, TokenService>();
+        service.AddScoped<IEncryptPasswordService>(_ =>
+        {
+            var saltSize = int.Parse(configuration["EncryptPasswordService:SaltSize"]!);
+            var threadsUsed = int.Parse(configuration["EncryptPasswordService:ThreadsUsed"]!);
+            var iterations = int.Parse(configuration["EncryptPasswordService:Iterations"]!);
+            var memoryUsed = int.Parse(configuration["EncryptPasswordService:MemoryUsed"]!);
+            var hashSize = int.Parse(configuration["EncryptPasswordService:HashSize"]!);
+
+            return new EncryptPasswordService(saltSize, threadsUsed, iterations, memoryUsed, hashSize);
+        });
+        service.AddScoped<ITokenService>(_ =>
+        {
+            var key = configuration["TokenService:AccessToken:Key"]!;
+            var appName = configuration["AppName"]!;
+            var expiresInMinutes = int.Parse(configuration["TokenService:AccessToken:ExpiresInMinutes"]!);
+            var bytesToRandomRefreshToken = int.Parse(configuration["TokenService:RefreshToken:BytesToRandomRefreshToken"]!);
+
+            return new TokenService(key, appName, expiresInMinutes, bytesToRandomRefreshToken);
+        });
     }
 }

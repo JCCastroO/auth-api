@@ -6,7 +6,7 @@ namespace Auth.Api.Controller.Tests.Unit.Services;
 
 public class TokenServiceTests
 {
-    private readonly ITokenService _service = new TokenService();
+    private readonly ITokenService _service = new TokenService("key", "app", 60, 64);
 
     [Fact]
     public void ShouldGenerateAnJsonWebToken()

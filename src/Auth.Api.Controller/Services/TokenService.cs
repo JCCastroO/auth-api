@@ -8,13 +8,16 @@ using System.Text;
 
 namespace Auth.Api.Controller.Services;
 
-public class TokenService : ITokenService
+public class TokenService(
+    string key,
+    string appName,
+    int expiresInMinutes,
+    int bytesToRandomRefreshToken) : ITokenService
 {
-    private const string KEY = "5a3c0872f5889fdee74c1f65a1244ac17eb7f820";
-    private const string ISSUER = "Authentication.Api";
-    private const string AUDIENCE = "Authentication.Api";
-    private const int EXPIRES_IN_MINUTES = 60;
-    private const int BYTES_TO_RANDOM_REFRESH_TOKEN = 64;
+    private readonly string _key = key;
+    private readonly string _appName = appName;
+    private readonly int _expiresInMinutes = expiresInMinutes;
+    private readonly int _bytesToRandomRefreshToken = bytesToRandomRefreshToken;
 
     public (string AccessToken, DateTimeOffset ExpiresOn) Generate(UserEntity user)
     {
@@ -25,13 +28,13 @@ public class TokenService : ITokenService
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(KEY));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_key));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        var expiresOn = DateTimeOffset.UtcNow.AddMinutes(EXPIRES_IN_MINUTES);
+        var expiresOn = DateTimeOffset.UtcNow.AddMinutes(_expiresInMinutes);
         var token = new JwtSecurityToken(
-            issuer: ISSUER,
-            audience: AUDIENCE,
+            issuer: _appName,
+            audience: _appName,
             claims: claims,
             expires: expiresOn.Date,
             signingCredentials: creds);
@@ -41,7 +44,7 @@ public class TokenService : ITokenService
 
     public string GenerateRefresh()
     {
-        var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(BYTES_TO_RANDOM_REFRESH_TOKEN));
+        var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(_bytesToRandomRefreshToken));
         return Convert.ToBase64String(SHA256.HashData(Encoding.UTF8.GetBytes(token)));
     }
 }

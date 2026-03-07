@@ -122,7 +122,7 @@ public class DependencyInjectionTests : IClassFixture<PostgreSqlFixture>, IClass
     public void ShouldInjectEncryptPasswordServiceAsADependency()
     {
         // Arrange
-        var expectedService = new EncryptPasswordService();
+        var expectedService = new EncryptPasswordService(default, default, default, default, default);
 
         // Act
         var service = _provider.GetRequiredService<IEncryptPasswordService>();
@@ -136,7 +136,7 @@ public class DependencyInjectionTests : IClassFixture<PostgreSqlFixture>, IClass
     public void ShouldInjectTokenServiceAsADependency()
     {
         // Arrange
-        var expectedService = new TokenService();
+        var expectedService = new TokenService(default!, default!, default, default);
 
         // Act
         var service = _provider.GetRequiredService<ITokenService>();

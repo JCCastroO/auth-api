@@ -5,7 +5,7 @@ namespace Auth.Api.Controller.Tests.Unit.Services;
 
 public class EncryptPasswordServiceTests
 {
-    private readonly IEncryptPasswordService _service = new EncryptPasswordService();
+    private readonly IEncryptPasswordService _service = new EncryptPasswordService(16, 8, 4, 1024 * 64, 32);
 
     [Fact]
     public void ShouldEncryptPassword()
