@@ -1,4 +1,4 @@
-﻿using Auth.Api.Controller.Dtos;
+﻿using Auth.Api.Controller.Requests;
 using Auth.Api.Controller.Services.Interfaces;
 using Auth.Api.Controller.UseCases.Interfaces;
 using Auth.Api.Model.Entities;
@@ -12,7 +12,7 @@ public class RegisterUserUseCase(IUserRepository repository, IEncryptPasswordSer
     private readonly IUserRepository _repository = repository;
     private readonly IEncryptPasswordService _encryptPasswordService = encryptPasswordService;
 
-    public async Task<Result> Execute(RegisterUserDto userDto)
+    public async Task<Result> Execute(RegisterUserRequest userDto)
     {
         var (existingUserSuccess, existingUser, existingUserError) = await _repository.GetByEmail(userDto.Email);
         if (!existingUserSuccess && existingUserError is not null)

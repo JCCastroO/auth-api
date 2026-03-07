@@ -1,4 +1,5 @@
-﻿using Auth.Api.Controller.Dtos;
+﻿using Auth.Api.Controller.Requests;
+using Auth.Api.Controller.Responses;
 using Auth.Api.Controller.Services.Interfaces;
 using Auth.Api.Controller.UseCases;
 using Auth.Api.Controller.UseCases.Interfaces;
@@ -26,19 +27,19 @@ public class LoginUseCaseTests
     public async Task ShouldExecuteLoginThenReturnErrorWhenGetByEmailFailed()
     {
         // Arrange
-        var dto = new LoginDto("john.doe@email.com", "john@123");
+        var request = new LoginRequest("john.doe@email.com", "john@123");
 
         _repository
-            .GetByEmail(Arg.Do<string>(x => x = dto.Email))
+            .GetByEmail(Arg.Do<string>(x => x = request.Email))
             .Returns(Result.Error<UserEntity?>(new Exception("Internal Error")));
 
         // Act
-        var result = await _sut.Execute(dto);
+        var result = await _sut.Execute(request);
 
         // Assert
         Assert.False(result.IsSuccess);
         Assert.Null(result.Value);
-        await _repository.Received().GetByEmail(Arg.Do<string>(x => x = dto.Email));
+        await _repository.Received().GetByEmail(Arg.Do<string>(x => x = request.Email));
         _encryptPasswordService.DidNotReceive()
             .Validate(default!, default!);
         _tokenService
@@ -56,19 +57,19 @@ public class LoginUseCaseTests
     public async Task ShouldExecuteLoginThenReturnErrorWhenUserNotFound()
     {
         // Arrange
-        var dto = new LoginDto("john.doe@email.com", "john@123");
+        var request = new LoginRequest("john.doe@email.com", "john@123");
 
         _repository
-            .GetByEmail(Arg.Do<string>(x => x = dto.Email))
+            .GetByEmail(Arg.Do<string>(x => x = request.Email))
             .Returns(Result.Success<UserEntity?>(null));
 
         // Act
-        var result = await _sut.Execute(dto);
+        var result = await _sut.Execute(request);
 
         // Assert
         Assert.False(result.IsSuccess);
         Assert.Null(result.Value);
-        await _repository.Received().GetByEmail(Arg.Do<string>(x => x = dto.Email));
+        await _repository.Received().GetByEmail(Arg.Do<string>(x => x = request.Email));
         _encryptPasswordService.DidNotReceive()
             .Validate(default!, default!);
         _tokenService
@@ -86,34 +87,34 @@ public class LoginUseCaseTests
     public async Task ShouldExecuteLoginThenReturnErrorWhenUseAWrongPassword()
     {
         // Arrange
-        var dto = new LoginDto("john.doe@email.com", "john@123");
+        var request = new LoginRequest("john.doe@email.com", "john@123");
 
         var user = new UserEntity()
         {
             Name = "John Doe",
-            Email = dto.Email,
+            Email = request.Email,
             Password = _encryptPasswordService.Encrypt("123#john")
         };
         _repository
-            .GetByEmail(Arg.Do<string>(x => x = dto.Email))
+            .GetByEmail(Arg.Do<string>(x => x = request.Email))
             .Returns(Result.Success<UserEntity?>(user));
 
         _encryptPasswordService
-            .Validate(Arg.Do<string>(x => x = dto.Password), Arg.Do<string>(x => x = user.Password))
+            .Validate(Arg.Do<string>(x => x = request.Password), Arg.Do<string>(x => x = user.Password))
             .Returns(false);
 
         // Act
-        var result = await _sut.Execute(dto);
+        var result = await _sut.Execute(request);
 
         // Assert
         Assert.False(result.IsSuccess);
         Assert.Null(result.Value);
         await _repository
             .Received()
-            .GetByEmail(Arg.Do<string>(x => x = dto.Email));
+            .GetByEmail(Arg.Do<string>(x => x = request.Email));
         _encryptPasswordService
             .Received()
-            .Validate(Arg.Do<string>(x => x = dto.Password), Arg.Do<string>(x => x = user.Password));
+            .Validate(Arg.Do<string>(x => x = request.Password), Arg.Do<string>(x => x = user.Password));
         _tokenService
             .DidNotReceive()
             .Generate(default!);
@@ -129,20 +130,20 @@ public class LoginUseCaseTests
     public async Task ShouldExecuteLoginThenReturnErrorWhenSetCacheFailed()
     {
         // Arrange
-        var dto = new LoginDto("john.doe@email.com", "john@123");
+        var request = new LoginRequest("john.doe@email.com", "john@123");
 
         var user = new UserEntity()
         {
             Name = "John Doe",
-            Email = dto.Email,
-            Password = _encryptPasswordService.Encrypt(dto.Password)
+            Email = request.Email,
+            Password = _encryptPasswordService.Encrypt(request.Password)
         };
         _repository
-            .GetByEmail(Arg.Do<string>(x => x = dto.Email))
+            .GetByEmail(Arg.Do<string>(x => x = request.Email))
             .Returns(Result.Success<UserEntity?>(user));
 
         _encryptPasswordService
-            .Validate(Arg.Do<string>(x => x = dto.Password), Arg.Do<string>(x => x = user.Password))
+            .Validate(Arg.Do<string>(x => x = request.Password), Arg.Do<string>(x => x = user.Password))
             .Returns(true);
 
         var accessToken = "access_token";
@@ -165,16 +166,16 @@ public class LoginUseCaseTests
             .Returns(Result.Error(new Exception("Internal Error")));
 
         // Act
-        var result = await _sut.Execute(dto);
+        var result = await _sut.Execute(request);
 
         // Assert
         Assert.False(result.IsSuccess);
         await _repository
             .Received()
-            .GetByEmail(Arg.Do<string>(x => x = dto.Email));
+            .GetByEmail(Arg.Do<string>(x => x = request.Email));
         _encryptPasswordService
             .Received()
-            .Validate(Arg.Do<string>(x => x = dto.Password), Arg.Do<string>(x => x = user.Password));
+            .Validate(Arg.Do<string>(x => x = request.Password), Arg.Do<string>(x => x = user.Password));
         _tokenService
             .Received()
             .Generate(Arg.Do<UserEntity>(x => x = user));
@@ -193,20 +194,20 @@ public class LoginUseCaseTests
     public async Task ShouldExecuteLoginThenReturnSuccessWithAccessToken()
     {
         // Arrange
-        var dto = new LoginDto("john.doe@email.com", "john@123");
+        var request = new LoginRequest("john.doe@email.com", "john@123");
 
         var user = new UserEntity()
         {
             Name = "John Doe",
-            Email = dto.Email,
-            Password = _encryptPasswordService.Encrypt(dto.Password)
+            Email = request.Email,
+            Password = _encryptPasswordService.Encrypt(request.Password)
         };
         _repository
-            .GetByEmail(Arg.Do<string>(x => x = dto.Email))
+            .GetByEmail(Arg.Do<string>(x => x = request.Email))
             .Returns(Result.Success<UserEntity?>(user));
 
         _encryptPasswordService
-            .Validate(Arg.Do<string>(x => x = dto.Password), Arg.Do<string>(x => x = user.Password))
+            .Validate(Arg.Do<string>(x => x = request.Password), Arg.Do<string>(x => x = user.Password))
             .Returns(true);
 
         var accessToken = "access_token";
@@ -231,7 +232,7 @@ public class LoginUseCaseTests
         var response = new LoginResponse(accessToken, refreshToken, expiresOn, expiresRefreshOn);
 
         // Act
-        var result = await _sut.Execute(dto);
+        var result = await _sut.Execute(request);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -241,10 +242,10 @@ public class LoginUseCaseTests
         Assert.Equal(response.ExpiresRefreshOn, result.Value.ExpiresRefreshOn, TimeSpan.FromSeconds(5));
         await _repository
             .Received()
-            .GetByEmail(Arg.Do<string>(x => x = dto.Email));
+            .GetByEmail(Arg.Do<string>(x => x = request.Email));
         _encryptPasswordService
             .Received()
-            .Validate(Arg.Do<string>(x => x = dto.Password), Arg.Do<string>(x => x = user.Password));
+            .Validate(Arg.Do<string>(x => x = request.Password), Arg.Do<string>(x => x = user.Password));
         _tokenService
             .Received()
             .Generate(Arg.Do<UserEntity>(x => x = user));

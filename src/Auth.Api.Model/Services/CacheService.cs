@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using OperationResult;
 using StackExchange.Redis;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Auth.Api.Model.Services;
 

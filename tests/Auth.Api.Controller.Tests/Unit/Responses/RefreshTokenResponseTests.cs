@@ -1,6 +1,6 @@
-﻿using Auth.Api.Controller.Dtos;
+﻿using Auth.Api.Controller.Responses;
 
-namespace Auth.Api.Controller.Tests.Unit.Dtos;
+namespace Auth.Api.Controller.Tests.Unit.Responses;
 
 public class RefreshTokenResponseTests
 {

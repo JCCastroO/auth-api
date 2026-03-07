@@ -1,7 +1,7 @@
-﻿using Auth.Api.Controller.UseCases.Interfaces;
-using Auth.Api.Controller.Dtos;
+﻿using Auth.Api.Controller.Requests;
+using Auth.Api.Controller.Responses;
+using Auth.Api.Controller.UseCases.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using OperationResult;
 
 namespace Auth.Api.View.Endpoints;
 
@@ -9,7 +9,7 @@ public static class AuthEndpoints
 {
     public static void MapAuthEndpoints(this IEndpointRouteBuilder router)
     {
-        router.MapPost("api/v1/auth/register", static async ([FromServices] IRegisterUserUseCase useCase, [FromBody] RegisterUserDto dto) =>
+        router.MapPost("api/v1/auth/register", static async ([FromServices] IRegisterUserUseCase useCase, [FromBody] RegisterUserRequest dto) =>
         {
             var (success, error) = await useCase.Execute(dto);
             if (!success && error is not null)
@@ -24,7 +24,7 @@ public static class AuthEndpoints
             .Produces(200)
             .Produces(500);
 
-        router.MapPost("api/v1/auth/login", static async ([FromServices] ILoginUseCase useCase, [FromBody] LoginDto dto) =>
+        router.MapPost("api/v1/auth/login", static async ([FromServices] ILoginUseCase useCase, [FromBody] LoginRequest dto) =>
         {
             var (success, result, error) = await useCase.Execute(dto);
             if (!success && error is not null)
@@ -39,7 +39,7 @@ public static class AuthEndpoints
             .Produces<LoginResponse>(200)
             .Produces(500);
 
-        router.MapPost("api/v1/auth/refresh_token", static async ([FromServices] IRefreshTokenUseCase useCase, [FromBody] RefreshTokenDto dto) =>
+        router.MapPost("api/v1/auth/refresh_token", static async ([FromServices] IRefreshTokenUseCase useCase, [FromBody] RefreshTokenRequest dto) =>
         {
             var (success, result, error) = await useCase.Execute(dto);
             if (!success && error is not null)

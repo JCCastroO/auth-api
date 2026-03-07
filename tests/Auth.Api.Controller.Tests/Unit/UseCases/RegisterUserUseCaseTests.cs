@@ -1,4 +1,4 @@
-﻿using Auth.Api.Controller.Dtos;
+﻿using Auth.Api.Controller.Requests;
 using Auth.Api.Controller.Services.Interfaces;
 using Auth.Api.Controller.UseCases;
 using Auth.Api.Controller.UseCases.Interfaces;
@@ -22,20 +22,20 @@ public class RegisterUserUseCaseTests
     public async Task ShouldExecuteRegisterUserThenReturnErrorWhenGetByEmailFailed()
     {
         // Arrange
-        var dto = new RegisterUserDto("John Doe", "john.doe@email.com", "john@123");
+        var request = new RegisterUserRequest("John Doe", "john.doe@email.com", "john@123");
 
         _repository
-            .GetByEmail(Arg.Do<string>(x => x = dto.Email))
+            .GetByEmail(Arg.Do<string>(x => x = request.Email))
             .Returns(Result.Error<UserEntity?>(new Exception("Internal Error")));
 
         // Act
-        var result = await _sut.Execute(dto);
+        var result = await _sut.Execute(request);
 
         // Assert
         Assert.False(result.IsSuccess);
         await _repository
             .Received()
-            .GetByEmail(Arg.Do<string>(x => x = dto.Email));
+            .GetByEmail(Arg.Do<string>(x => x = request.Email));
         await _repository
             .DidNotReceive()
             .Insert(default!);
@@ -48,27 +48,27 @@ public class RegisterUserUseCaseTests
     public async Task ShouldExecuteRegisterUserThenReturnErrorWhenEmailAlreadyExists()
     {
         // Arrange
-        var dto = new RegisterUserDto("John Doe", "john.doe@email.com", "john@123");
+        var request = new RegisterUserRequest("John Doe", "john.doe@email.com", "john@123");
 
         var user = new UserEntity()
         {
-            Name = dto.Name,
-            Email = dto.Email,
-            Password = dto.Password
+            Name = request.Name,
+            Email = request.Email,
+            Password = request.Password
         };
 
         _repository
-            .GetByEmail(Arg.Do<string>(x => x = dto.Email))
+            .GetByEmail(Arg.Do<string>(x => x = request.Email))
             .Returns(Result.Success<UserEntity?>(user));
 
         // Act
-        var result = await _sut.Execute(dto);
+        var result = await _sut.Execute(request);
 
         // Assert
         Assert.False(result.IsSuccess);
         await _repository
             .Received()
-            .GetByEmail(Arg.Do<string>(x => x = dto.Email));
+            .GetByEmail(Arg.Do<string>(x => x = request.Email));
         await _repository
             .DidNotReceive()
             .Insert(default!);
@@ -81,75 +81,75 @@ public class RegisterUserUseCaseTests
     public async Task ShouldExecuteRegisterUserThenReturnErrorWhenInsertUserFailed()
     {
         // Arrange
-        var dto = new RegisterUserDto("John Doe", "john.doe@email.com", "john@123");
+        var request = new RegisterUserRequest("John Doe", "john.doe@email.com", "john@123");
 
         var user = new UserEntity()
         {
-            Name = dto.Name,
-            Email = dto.Email,
-            Password = _encryptPasswordService.Encrypt(dto.Password)
+            Name = request.Name,
+            Email = request.Email,
+            Password = _encryptPasswordService.Encrypt(request.Password)
         };
 
         _repository
-            .GetByEmail(Arg.Do<string>(x => x = dto.Email))
+            .GetByEmail(Arg.Do<string>(x => x = request.Email))
             .Returns(Result.Success<UserEntity?>(null));
         _repository
             .Insert(Arg.Do<UserEntity>(x => x = user))
             .Returns(Result.Error(new Exception("Internal Error")));
 
         // Act
-        var result = await _sut.Execute(dto);
+        var result = await _sut.Execute(request);
 
         // Assert
         Assert.False(result.IsSuccess);
         await _repository
             .Received()
-            .GetByEmail(Arg.Do<string>(x => x = dto.Email));
+            .GetByEmail(Arg.Do<string>(x => x = request.Email));
         await _repository
             .Received()
             .Insert(Arg.Do<UserEntity>(x => x = user));
         _encryptPasswordService
             .Received()
-            .Encrypt(dto.Password);
+            .Encrypt(request.Password);
     }
 
     [Fact]
     public async Task ShouldExecuteRegisterUserThenReturnSucessWhenInsertUser()
     {
         // Arrange
-        var dto = new RegisterUserDto("John Doe", "john.doe@email.com", "john@123");
+        var request = new RegisterUserRequest("John Doe", "john.doe@email.com", "john@123");
 
         var user = new UserEntity()
         {
-            Name = dto.Name,
-            Email = dto.Email,
+            Name = request.Name,
+            Email = request.Email,
             Password = "encrypted_john@123"
         };
 
         _repository
-            .GetByEmail(Arg.Do<string>(x => x = dto.Email))
+            .GetByEmail(Arg.Do<string>(x => x = request.Email))
             .Returns(Result.Success<UserEntity?>(null));
         _repository
             .Insert(Arg.Do<UserEntity>(x => x = user))
             .Returns(Result.Success());
 
         _encryptPasswordService
-            .Encrypt(Arg.Do<string>(x => x = dto.Password))
+            .Encrypt(Arg.Do<string>(x => x = request.Password))
             .Returns(user.Password);
 
         // Act
-        var result = await _sut.Execute(dto);
+        var result = await _sut.Execute(request);
 
         // Assert
         Assert.True(result.IsSuccess);
         await _repository
             .Received()
-            .GetByEmail(Arg.Do<string>(x => x = dto.Email));
+            .GetByEmail(Arg.Do<string>(x => x = request.Email));
         await _repository
             .Received()
             .Insert(Arg.Do<UserEntity>(x => x = user));
         _encryptPasswordService
             .Received()
-            .Encrypt(Arg.Do<string>(x => x = dto.Password));
+            .Encrypt(Arg.Do<string>(x => x = request.Password));
     }
 }

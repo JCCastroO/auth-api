@@ -1,4 +1,5 @@
-﻿using Auth.Api.Controller.Dtos;
+﻿using Auth.Api.Controller.Requests;
+using Auth.Api.Controller.Responses;
 using Auth.Api.Controller.Services.Interfaces;
 using Auth.Api.Controller.UseCases.Interfaces;
 using Auth.Api.Model.Repositories.Interfaces;
@@ -20,7 +21,7 @@ public class LoginUseCase(
     private readonly ITokenService _tokenService = tokenService;
     private readonly ICacheService _cacheService = cacheService;
 
-    public async Task<Result<LoginResponse>> Execute(LoginDto dto)
+    public async Task<Result<LoginResponse>> Execute(LoginRequest dto)
     {
         var (userSuccess, user, userError) = await _repository.GetByEmail(dto.Email);
         if (!userSuccess && userError is not null)

@@ -1,4 +1,4 @@
-﻿using Auth.Api.Controller.Dtos;
+﻿using Auth.Api.Controller.Requests;
 using System.Net;
 using System.Net.Http.Json;
 
@@ -18,10 +18,10 @@ public class AuthEndpointsTests : IClassFixture<PostgreSqlFixture>, IClassFixtur
     public async Task ShoulCallPostAuthRegisterThenResultSuccess()
     {
         // Arrange
-        var dto = new RegisterUserDto("John Doe", "john.doe@email.com", "john@123");
+        var request = new RegisterUserRequest("John Doe", "john.doe@email.com", "john@123");
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/auth/register", dto);
+        var response = await _client.PostAsJsonAsync("api/v1/auth/register", request);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -31,10 +31,10 @@ public class AuthEndpointsTests : IClassFixture<PostgreSqlFixture>, IClassFixtur
     public async Task ShoulCallPostAuthLoginThenResultSuccess()
     {
         // Arrange
-        var dto = new LoginDto("doe.john@email.com", "doe@123");
+        var request = new LoginRequest("doe.john@email.com", "doe@123");
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/auth/login", dto);
+        var response = await _client.PostAsJsonAsync("api/v1/auth/login", request);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -44,10 +44,10 @@ public class AuthEndpointsTests : IClassFixture<PostgreSqlFixture>, IClassFixtur
     public async Task ShoulCallPostAuthRefreshTokenThenResultSuccess()
     {
         // Arrange
-        var dto = new RefreshTokenDto("refresh_token");
+        var request = new RefreshTokenRequest("refresh_token");
 
         // Act
-        var response = await _client.PostAsJsonAsync("api/v1/auth/refresh_token", dto);
+        var response = await _client.PostAsJsonAsync("api/v1/auth/refresh_token", request);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);

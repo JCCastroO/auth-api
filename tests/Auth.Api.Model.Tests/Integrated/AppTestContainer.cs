@@ -1,7 +1,6 @@
 ﻿using Dapper;
 using Npgsql;
 using StackExchange.Redis;
-using System.ComponentModel;
 using System.Data;
 using Testcontainers.PostgreSql;
 using Testcontainers.Redis;

@@ -1,4 +1,6 @@
 ﻿using Auth.Api.Controller.Dtos;
+using Auth.Api.Controller.Requests;
+using Auth.Api.Controller.Responses;
 using Auth.Api.Controller.Services.Interfaces;
 using Auth.Api.Controller.UseCases;
 using Auth.Api.Controller.UseCases.Interfaces;
@@ -23,20 +25,20 @@ public class RefreshTokenUseCaseTests
     public async Task ShouldExecuteRefreshTokenUseCaseThenReturnErrorWhenGetCacheFailed()
     {
         // Arrange
-        var dto = new RefreshTokenDto("refresh_token");
+        var request = new RefreshTokenRequest("refresh_token");
 
         _cacheService
-            .GetAsync<RefreshTokenCacheResultDto>(Arg.Do<string>(x => x = $"refresh#{dto.RefreshToken}"))
+            .GetAsync<RefreshTokenCacheResultDto>(Arg.Do<string>(x => x = $"refresh#{request.RefreshToken}"))
             .Returns(Result.Error<RefreshTokenCacheResultDto?>(new Exception("Internal Error")));
 
         // Act
-        var result = await _sut.Execute(dto);
+        var result = await _sut.Execute(request);
 
         // Assert
         Assert.False(result.IsSuccess);
         await _cacheService
             .Received()
-            .GetAsync<RefreshTokenCacheResultDto>(Arg.Do<string>(x => x = $"refresh#{dto.RefreshToken}"));
+            .GetAsync<RefreshTokenCacheResultDto>(Arg.Do<string>(x => x = $"refresh#{request.RefreshToken}"));
         _tokenService
             .DidNotReceive()
             .Generate(default!);
@@ -55,20 +57,20 @@ public class RefreshTokenUseCaseTests
     public async Task ShouldExecuteRefreshTokenUseCaseThenReturnErrorWhenCacheNotFound()
     {
         // Arrange
-        var dto = new RefreshTokenDto("refresh_token");
+        var request = new RefreshTokenRequest("refresh_token");
 
         _cacheService
-            .GetAsync<RefreshTokenCacheResultDto>(Arg.Do<string>(x => x = $"refresh#{dto.RefreshToken}"))
+            .GetAsync<RefreshTokenCacheResultDto>(Arg.Do<string>(x => x = $"refresh#{request.RefreshToken}"))
             .Returns(Result.Success<RefreshTokenCacheResultDto?>(default));
 
         // Act
-        var result = await _sut.Execute(dto);
+        var result = await _sut.Execute(request);
 
         // Assert
         Assert.False(result.IsSuccess);
         await _cacheService
             .Received()
-            .GetAsync<RefreshTokenCacheResultDto>(Arg.Do<string>(x => x = $"refresh#{dto.RefreshToken}"));
+            .GetAsync<RefreshTokenCacheResultDto>(Arg.Do<string>(x => x = $"refresh#{request.RefreshToken}"));
         _tokenService
             .DidNotReceive()
             .Generate(default!);
@@ -87,11 +89,11 @@ public class RefreshTokenUseCaseTests
     public async Task ShouldExecuteRefreshTokenUseCaseThenReturnErrorWhenRemoveOldCacheDataFailed()
     {
         // Arrange
-        var dto = new RefreshTokenDto("refresh_token");
+        var request = new RefreshTokenRequest("refresh_token");
 
         var cacheData = new RefreshTokenCacheResultDto(Guid.NewGuid(), "john.doe@email.com");
         _cacheService
-            .GetAsync<RefreshTokenCacheResultDto>(Arg.Do<string>(x => x = $"refresh#{dto.RefreshToken}"))
+            .GetAsync<RefreshTokenCacheResultDto>(Arg.Do<string>(x => x = $"refresh#{request.RefreshToken}"))
             .Returns(Result.Success<RefreshTokenCacheResultDto?>(cacheData));
 
         var user = new UserEntity
@@ -112,17 +114,17 @@ public class RefreshTokenUseCaseTests
             .Returns(refreshToken);
 
         _cacheService
-            .RemoveAsync(Arg.Do<string>(x => x = $"refresh#{dto.RefreshToken}"))
+            .RemoveAsync(Arg.Do<string>(x => x = $"refresh#{request.RefreshToken}"))
             .Returns(Result.Error(new Exception("Internal Error")));
 
         // Act
-        var result = await _sut.Execute(dto);
+        var result = await _sut.Execute(request);
 
         // Assert
         Assert.False(result.IsSuccess);
         await _cacheService
             .Received()
-            .GetAsync<RefreshTokenCacheResultDto>(Arg.Do<string>(x => x = $"refresh#{dto.RefreshToken}"));
+            .GetAsync<RefreshTokenCacheResultDto>(Arg.Do<string>(x => x = $"refresh#{request.RefreshToken}"));
         _tokenService
             .Received()
             .Generate(Arg.Do<UserEntity>(x => x = user));
@@ -131,7 +133,7 @@ public class RefreshTokenUseCaseTests
             .GenerateRefresh();
         await _cacheService
             .Received()
-            .RemoveAsync(Arg.Do<string>(x => x = $"refresh#{dto.RefreshToken}"));
+            .RemoveAsync(Arg.Do<string>(x => x = $"refresh#{request.RefreshToken}"));
         await _cacheService
             .DidNotReceive()
             .SetAsync(default!, default!, default!);
@@ -141,11 +143,11 @@ public class RefreshTokenUseCaseTests
     public async Task ShouldExecuteRefreshTokenUseCaseThenReturnErrorWhenSetCacheDataFailed()
     {
         // Arrange
-        var dto = new RefreshTokenDto("refresh_token");
+        var request = new RefreshTokenRequest("refresh_token");
 
         var cacheData = new RefreshTokenCacheResultDto(Guid.NewGuid(), "john.doe@email.com");
         _cacheService
-            .GetAsync<RefreshTokenCacheResultDto>(Arg.Do<string>(x => x = $"refresh#{dto.RefreshToken}"))
+            .GetAsync<RefreshTokenCacheResultDto>(Arg.Do<string>(x => x = $"refresh#{request.RefreshToken}"))
             .Returns(Result.Success<RefreshTokenCacheResultDto?>(cacheData));
 
         var user = new UserEntity
@@ -166,7 +168,7 @@ public class RefreshTokenUseCaseTests
             .Returns(refreshToken);
 
         _cacheService
-            .RemoveAsync(Arg.Do<string>(x => x = $"refresh#{dto.RefreshToken}"))
+            .RemoveAsync(Arg.Do<string>(x => x = $"refresh#{request.RefreshToken}"))
             .Returns(Result.Success());
 
         _cacheService
@@ -177,13 +179,13 @@ public class RefreshTokenUseCaseTests
             .Returns(Result.Error(new Exception("Internal Error")));
 
         // Act
-        var result = await _sut.Execute(dto);
+        var result = await _sut.Execute(request);
 
         // Assert
         Assert.False(result.IsSuccess);
         await _cacheService
             .Received()
-            .GetAsync<RefreshTokenCacheResultDto>(Arg.Do<string>(x => x = $"refresh#{dto.RefreshToken}"));
+            .GetAsync<RefreshTokenCacheResultDto>(Arg.Do<string>(x => x = $"refresh#{request.RefreshToken}"));
         _tokenService
             .Received()
             .Generate(Arg.Do<UserEntity>(x => x = user));
@@ -192,7 +194,7 @@ public class RefreshTokenUseCaseTests
             .GenerateRefresh();
         await _cacheService
             .Received()
-            .RemoveAsync(Arg.Do<string>(x => x = $"refresh#{dto.RefreshToken}"));
+            .RemoveAsync(Arg.Do<string>(x => x = $"refresh#{request.RefreshToken}"));
         await _cacheService
             .Received()
             .SetAsync(
@@ -205,11 +207,11 @@ public class RefreshTokenUseCaseTests
     public async Task ShouldExecuteRefreshTokenUseCaseThenReturnSuccess()
     {
         // Arrange
-        var dto = new RefreshTokenDto("refresh_token");
+        var request = new RefreshTokenRequest("refresh_token");
 
         var cacheData = new RefreshTokenCacheResultDto(Guid.NewGuid(), "john.doe@email.com");
         _cacheService
-            .GetAsync<RefreshTokenCacheResultDto>(Arg.Do<string>(x => x = $"refresh#{dto.RefreshToken}"))
+            .GetAsync<RefreshTokenCacheResultDto>(Arg.Do<string>(x => x = $"refresh#{request.RefreshToken}"))
             .Returns(Result.Success<RefreshTokenCacheResultDto?>(cacheData));
 
         var user = new UserEntity
@@ -230,7 +232,7 @@ public class RefreshTokenUseCaseTests
             .Returns(refreshToken);
 
         _cacheService
-            .RemoveAsync(Arg.Do<string>(x => x = $"refresh#{dto.RefreshToken}"))
+            .RemoveAsync(Arg.Do<string>(x => x = $"refresh#{request.RefreshToken}"))
             .Returns(Result.Success());
 
         _cacheService
@@ -243,7 +245,7 @@ public class RefreshTokenUseCaseTests
         var response = new RefreshTokenResponse(accessToken, refreshToken, expiresOn, expiresRefreshOn);
 
         // Act
-        var result = await _sut.Execute(dto);
+        var result = await _sut.Execute(request);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -253,7 +255,7 @@ public class RefreshTokenUseCaseTests
         Assert.Equal(response.ExpiresRefreshOn, result.Value.ExpiresRefreshOn, TimeSpan.FromSeconds(5));
         await _cacheService
             .Received()
-            .GetAsync<RefreshTokenCacheResultDto>(Arg.Do<string>(x => x = $"refresh#{dto.RefreshToken}"));
+            .GetAsync<RefreshTokenCacheResultDto>(Arg.Do<string>(x => x = $"refresh#{request.RefreshToken}"));
         _tokenService
             .Received()
             .Generate(Arg.Do<UserEntity>(x => x = user));
@@ -262,7 +264,7 @@ public class RefreshTokenUseCaseTests
             .GenerateRefresh();
         await _cacheService
             .Received()
-            .RemoveAsync(Arg.Do<string>(x => x = $"refresh#{dto.RefreshToken}"));
+            .RemoveAsync(Arg.Do<string>(x => x = $"refresh#{request.RefreshToken}"));
         await _cacheService
             .Received()
             .SetAsync(

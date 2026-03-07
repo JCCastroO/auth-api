@@ -1,4 +1,6 @@
 ﻿using Auth.Api.Controller.Dtos;
+using Auth.Api.Controller.Requests;
+using Auth.Api.Controller.Responses;
 using Auth.Api.Controller.Services.Interfaces;
 using Auth.Api.Controller.UseCases.Interfaces;
 using Auth.Api.Model.Entities;
@@ -16,7 +18,7 @@ public class RefreshTokenUseCase(
     private readonly ICacheService _cacheService = cacheService;
     private readonly ITokenService _tokenService = tokenService;
 
-    public async Task<Result<RefreshTokenResponse>> Execute(RefreshTokenDto dto)
+    public async Task<Result<RefreshTokenResponse>> Execute(RefreshTokenRequest dto)
     {
         var cacheKey = $"refresh#{dto.RefreshToken}";
         var (cacheDataSuccess, cacheData, cacheDataError) = await _cacheService.GetAsync<RefreshTokenCacheResultDto>(cacheKey);

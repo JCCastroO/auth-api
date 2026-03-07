@@ -7,7 +7,6 @@ using Auth.Api.Model.Repositories.Interfaces;
 using Auth.Api.Model.Services;
 using Auth.Api.Model.Services.Interfaces;
 using Npgsql;
-using StackExchange.Redis;
 using System.Data;
 
 namespace Auth.Api.View.Extensions;

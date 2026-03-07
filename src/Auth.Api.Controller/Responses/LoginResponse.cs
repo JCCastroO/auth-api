@@ -1,3 +1,3 @@
-﻿namespace Auth.Api.Controller.Dtos;
+﻿namespace Auth.Api.Controller.Responses;
 
 public record LoginResponse(string AccessToken, string RefreshToken, DateTimeOffset ExpiresOn, DateTimeOffset ExpiresRefreshOn);

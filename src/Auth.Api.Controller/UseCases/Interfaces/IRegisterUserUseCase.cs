@@ -1,9 +1,9 @@
-﻿using Auth.Api.Controller.Dtos;
+﻿using Auth.Api.Controller.Requests;
 using OperationResult;
 
 namespace Auth.Api.Controller.UseCases.Interfaces;
 
 public interface IRegisterUserUseCase
 {
-    Task<Result> Execute(RegisterUserDto userDto);
+    Task<Result> Execute(RegisterUserRequest userDto);
 }
