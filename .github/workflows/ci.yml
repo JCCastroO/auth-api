@@ -46,7 +46,7 @@ jobs:
             -reporttypes:"HtmlSummary"
 
     - name: Code coverage summary
-      uses: irongut/CodeCoverageSummary@v4
+      uses: irongut/CodeCoverageSummary@v1.3.0
       with:
         filename: coverage/**/coverage.cobertura.xml
         badge: true
