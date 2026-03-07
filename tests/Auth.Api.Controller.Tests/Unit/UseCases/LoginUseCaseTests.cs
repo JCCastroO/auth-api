@@ -146,12 +146,13 @@ public class LoginUseCaseTests
             .Returns(true);
 
         var accessToken = "access_token";
-        var refreshToken = "refresh_token";
         var expiresOn = DateTimeOffset.UtcNow.AddMinutes(60);
-        var expiresRefreshOn = DateTimeOffset.UtcNow.AddDays(7);
         _tokenService
             .Generate(Arg.Do<UserEntity>(x => x = user))
             .Returns((accessToken, expiresOn));
+
+        var refreshToken = "refresh_token";
+        var expiresRefreshOn = DateTimeOffset.UtcNow.AddDays(7);
         _tokenService
             .GenerateRefresh()
             .Returns(refreshToken);
@@ -209,12 +210,13 @@ public class LoginUseCaseTests
             .Returns(true);
 
         var accessToken = "access_token";
-        var refreshToken = "refresh_token";
         var expiresOn = DateTimeOffset.UtcNow.AddMinutes(60);
-        var expiresRefreshOn = DateTimeOffset.UtcNow.AddDays(7);
         _tokenService
             .Generate(Arg.Do<UserEntity>(x => x = user))
             .Returns((accessToken, expiresOn));
+
+        var refreshToken = "refresh_token";
+        var expiresRefreshOn = DateTimeOffset.UtcNow.AddDays(7);
         _tokenService
             .GenerateRefresh()
             .Returns(refreshToken);

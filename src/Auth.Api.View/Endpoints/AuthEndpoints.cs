@@ -38,5 +38,20 @@ public static class AuthEndpoints
             .WithDescription("This endpoint is a request for get an access token linked to the user.")
             .Produces<LoginResponse>(200)
             .Produces(500);
+
+        router.MapPost("api/v1/auth/refresh_token", static async ([FromServices] IRefreshTokenUseCase useCase, [FromBody] RefreshTokenDto dto) =>
+        {
+            var (success, result, error) = await useCase.Execute(dto);
+            if (!success && error is not null)
+                return Results.InternalServerError(error);
+
+            return Results.Ok(result);
+        })
+            .WithName("Refresh User Access")
+            .WithDisplayName("Refresh User Access")
+            .WithTags("Auth")
+            .WithDescription("This endpoint is a request for refresh access token linked to the user.")
+            .Produces<RefreshTokenResponse>(200)
+            .Produces(500);
     }
 }

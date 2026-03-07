@@ -105,6 +105,20 @@ public class DependencyInjectionTests : IClassFixture<PostgreSqlFixture>, IClass
     }
 
     [Fact]
+    public void ShouldInjectRefreshTokenUseCaseAsADependency()
+    {
+        // Arrange
+        var useCase = new RefreshTokenUseCase(default!, default!);
+
+        // Act
+        var service = _provider.GetRequiredService<IRefreshTokenUseCase>();
+
+        // Assert
+        Assert.NotNull(service);
+        Assert.Equivalent(useCase, service);
+    }
+
+    [Fact]
     public void ShouldInjectEncryptPasswordServiceAsADependency()
     {
         // Arrange

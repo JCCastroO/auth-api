@@ -35,6 +35,7 @@ public static class ServiceCollectionExtension
 
         service.AddScoped<IRegisterUserUseCase, RegisterUserUseCase>();
         service.AddScoped<ILoginUseCase, LoginUseCase>();
+        service.AddScoped<IRefreshTokenUseCase, RefreshTokenUseCase>();
 
         service.AddScoped<IEncryptPasswordService, EncryptPasswordService>();
         service.AddScoped<ITokenService, TokenService>();

@@ -39,4 +39,17 @@ public class AuthEndpointsTests : IClassFixture<PostgreSqlFixture>, IClassFixtur
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
+
+    [Fact]
+    public async Task ShoulCallPostAuthRefreshTokenThenResultSuccess()
+    {
+        // Arrange
+        var dto = new RefreshTokenDto("refresh_token");
+
+        // Act
+        var response = await _client.PostAsJsonAsync("api/v1/auth/refresh_token", dto);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
 }

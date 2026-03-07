@@ -1,4 +1,5 @@
 ﻿using Auth.Api.Model.Services.Interfaces;
+using Newtonsoft.Json;
 using OperationResult;
 using StackExchange.Redis;
 
@@ -19,6 +20,21 @@ public class CacheService(IConnectionMultiplexer connection) : ICacheService
         catch (Exception ex)
         {
             return Result.Error(ex);
+        }
+    }
+
+    public async Task<Result<T>> GetAsync<T>(string key)
+    {
+        try
+        {
+            var data = await _database.StringGetAsync(key);
+            var result = JsonConvert.DeserializeObject<T>(data);
+
+            return Result.Success(result);
+        }
+        catch (Exception ex)
+        {
+            return Result.Error<T>(ex);
         }
     }
 }

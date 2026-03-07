@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Newtonsoft.Json;
 using Npgsql;
 using StackExchange.Redis;
 using System.Data;
@@ -39,6 +40,7 @@ public class AppTestContainer(PostgreSqlFixture dbFixture, RedisFixture redisFix
 
             services.AddSingleton<IRegisterUserUseCase, RegisterUserUseCase>();
             services.AddSingleton<ILoginUseCase, LoginUseCase>();
+            services.AddSingleton<IRefreshTokenUseCase, RefreshTokenUseCase>();
 
             services.AddSingleton<IEncryptPasswordService, EncryptPasswordService>();
             services.AddSingleton<ITokenService, TokenService>();
@@ -107,10 +109,22 @@ public class RedisFixture : IAsyncLifetime
             .Build();
 
         await Container.StartAsync();
+
+        await AddDataAsync();
     }
 
     public async Task DisposeAsync()
     {
         await Container.DisposeAsync();
+    }
+
+    private async Task AddDataAsync()
+    {
+        using var connection = ConnectionMultiplexer.Connect(Container.GetConnectionString());
+        var database = connection.GetDatabase();
+
+        var key = "refresh#refresh_token";
+        var data = JsonConvert.SerializeObject(new { Id = Guid.NewGuid().ToString(), Email = "john.doe@email.com" });
+        await database.StringSetAsync(key, data, TimeSpan.FromSeconds(30));
     }
 }
