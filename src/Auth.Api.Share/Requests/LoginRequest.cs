@@ -1,3 +1,3 @@
-﻿namespace Auth.Api.Controller.Requests;
+﻿namespace Auth.Api.Share.Requests;
 
 public record LoginRequest(string Email, string Password);

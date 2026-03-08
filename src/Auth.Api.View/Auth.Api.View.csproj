@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Auth.Api.Controller\Auth.Api.Controller.csproj" />
     <ProjectReference Include="..\Auth.Api.ServiceDefaults\Auth.Api.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\Auth.Api.Share\Auth.Api.Share.csproj" />
   </ItemGroup>
 
 </Project>

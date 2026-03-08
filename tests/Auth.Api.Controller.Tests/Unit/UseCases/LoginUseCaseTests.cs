@@ -1,12 +1,11 @@
-﻿using Auth.Api.Controller.Requests;
-using Auth.Api.Controller.Responses;
-using Auth.Api.Controller.Services.Interfaces;
+﻿using Auth.Api.Controller.Services.Interfaces;
 using Auth.Api.Controller.UseCases;
 using Auth.Api.Controller.UseCases.Interfaces;
 using Auth.Api.Model.Entities;
 using Auth.Api.Model.Repositories.Interfaces;
 using Auth.Api.Model.Services.Interfaces;
-using Castle.Core.Logging;
+using Auth.Api.Share.Requests;
+using Auth.Api.Share.Responses;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using NSubstitute;

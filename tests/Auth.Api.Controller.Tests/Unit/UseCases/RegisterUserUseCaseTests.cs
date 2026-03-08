@@ -1,9 +1,9 @@
-﻿using Auth.Api.Controller.Requests;
-using Auth.Api.Controller.Services.Interfaces;
+﻿using Auth.Api.Controller.Services.Interfaces;
 using Auth.Api.Controller.UseCases;
 using Auth.Api.Controller.UseCases.Interfaces;
 using Auth.Api.Model.Entities;
 using Auth.Api.Model.Repositories.Interfaces;
+using Auth.Api.Share.Requests;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using OperationResult;

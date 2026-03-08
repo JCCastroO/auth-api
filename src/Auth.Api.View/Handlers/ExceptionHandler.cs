@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace Auth.Api.View.Handlers;
+﻿namespace Auth.Api.View.Handlers;
 
 public static class ExceptionHandler
 {

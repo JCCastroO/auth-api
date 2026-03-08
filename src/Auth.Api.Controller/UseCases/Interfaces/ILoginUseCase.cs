@@ -1,5 +1,5 @@
-﻿using Auth.Api.Controller.Requests;
-using Auth.Api.Controller.Responses;
+﻿using Auth.Api.Share.Requests;
+using Auth.Api.Share.Responses;
 using OperationResult;
 
 namespace Auth.Api.Controller.UseCases.Interfaces;

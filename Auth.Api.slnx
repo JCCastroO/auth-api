@@ -13,6 +13,10 @@
     <Project Path="src/Auth.Api.Controller/Auth.Api.Controller.csproj" />
     <Project Path="tests/Auth.Api.Controller.Tests/Auth.Api.Controller.Tests.csproj" />
   </Folder>
+  <Folder Name="/04 - Shareable/">
+    <Project Path="src/Auth.Api.Share/Auth.Api.Share.csproj" Id="fa499105-a993-486c-81de-607d29d47568" />
+    <Project Path="tests/Auth.Api.Share.Tests/Auth.Api.Share.Tests.csproj" Id="1a4ab07e-1e8a-4e0a-b913-990cb6956adf" />
+  </Folder>
   <Folder Name="/SolutionItems/">
     <File Path=".editorconfig" />
     <File Path=".github/workflows/ci.yml" />

@@ -1,3 +1,3 @@
-﻿namespace Auth.Api.Controller.Dtos;
+﻿namespace Auth.Api.Share.Dtos;
 
 public record RefreshTokenCacheResultDto(Guid Id, string Email);

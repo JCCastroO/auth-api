@@ -1,4 +1,4 @@
-﻿using Auth.Api.Controller.Requests;
+﻿using Auth.Api.Share.Requests;
 using System.Net;
 using System.Net.Http.Json;
 

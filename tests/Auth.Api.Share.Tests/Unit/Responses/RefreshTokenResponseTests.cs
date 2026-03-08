@@ -1,6 +1,6 @@
-﻿using Auth.Api.Controller.Responses;
+﻿using Auth.Api.Share.Responses;
 
-namespace Auth.Api.Controller.Tests.Unit.Responses;
+namespace Auth.Api.Share.Tests.Unit.Responses;
 
 public class RefreshTokenResponseTests
 {

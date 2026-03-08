@@ -1,6 +1,6 @@
-﻿using Auth.Api.Controller.Requests;
+﻿using Auth.Api.Share.Requests;
 
-namespace Auth.Api.Controller.Tests.Unit.Requests;
+namespace Auth.Api.Share.Tests.Unit.Requests;
 
 public class LoginRequestTests
 {

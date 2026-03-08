@@ -1,6 +1,6 @@
-﻿using Auth.Api.Controller.Dtos;
+﻿using Auth.Api.Share.Dtos;
 
-namespace Auth.Api.Controller.Tests.Unit.Dtos;
+namespace Auth.Api.Share.Tests.Unit.Dtos;
 
 public class RefreshTokenCacheResultDtoTests
 {

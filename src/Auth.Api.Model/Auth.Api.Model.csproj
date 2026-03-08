@@ -13,4 +13,8 @@
 	<PackageReference Include="StackExchange.Redis" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Auth.Api.Share\Auth.Api.Share.csproj" />
+  </ItemGroup>
+
 </Project>
