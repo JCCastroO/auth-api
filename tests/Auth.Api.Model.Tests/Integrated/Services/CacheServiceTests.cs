@@ -41,6 +41,22 @@ public class CacheServiceTests : AppTestContainer
     }
 
     [Fact]
+    public async Task ShouldNotFoundDataOnCacheDatabase()
+    {
+        // Arrange
+        var service = new CacheService(RedisConnection);
+
+        var key = "KEY";
+
+        // Act
+        var result = await service.GetAsync<object>(key);
+
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.Null(result.Value);
+    }
+
+    [Fact]
     public async Task ShouldRemoveDataOnCacheDatabase()
     {
         // Arrange
