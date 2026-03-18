@@ -278,15 +278,6 @@ This project is meant to showcase backend engineering practices such as:
 
 It is a practical example of how to build a small but structured authentication service using modern `.NET` tooling.
 
-## Possible Next Improvements
-
-- Add JWT bearer authentication middleware for protected routes
-- Add request validation with explicit client error messages
-- Add structured problem details for exception handling
-- Add CI badges and deployment instructions
-- Add role and permission support
-- Add protected resource endpoints to demonstrate authorization
-
 ## Author
 
 Developed by João Carlos de Castro Oliveira.
